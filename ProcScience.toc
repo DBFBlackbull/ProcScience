@@ -1,0 +1,10 @@
+## Interface: 11302
+## Title: ProcScience
+## Notes: ProcScience
+## Author: magey
+## Version: 1.0
+## SavedVariablesPerCharacter: ProcScienceStats
+
+Procs.lua
+Sources.lua
+ProcScience.lua
