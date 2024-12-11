@@ -1,8 +1,9 @@
 ## ProcScience from Classic WoW Armaments
 
-This addon is a direct copy from the Classic WoW Armaments Discord server: https://discord.gg/NKjS5KKk
+This addon is a direct copy from the Classic WoW Armaments Discord server: https://discord.gg/NKjS5KKk.
+This is not the official github repository of this addon. No official repository seems exists.
 
-I do not own this server, the addon or is affiliated with either in any way.
+I do not own the discord server, the addon or is affiliated with either in any way.
 
 ## Functionality
 
