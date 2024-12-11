@@ -1,3 +1,9 @@
+# Work in Progress
+
+This is a work in progress, trying to backport the ProcScience addon from 1.14 Classic to 1.12.1 Vanilla.
+
+For the 1.14 version check the 'classic' branch. 
+
 ## ProcScience from Classic WoW Armaments
 
 This addon is a direct copy from the Classic WoW Armaments Discord server: https://discord.gg/NKjS5KKk.
