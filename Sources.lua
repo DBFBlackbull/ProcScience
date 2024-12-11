@@ -54,3 +54,11 @@ L.ROGUE = {
 		6770  -- Sap
 	}
 }
+
+L.SHAMAN = {
+	Damage = {
+		17364,   -- Stormstrike
+	},
+	Aura = {
+	}
+}
