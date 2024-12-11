@@ -29,12 +29,12 @@ function ProcScience:Print(...)
 end
 
 function ProcScience:SpellName(spellID)
-    local name = GetSpellInfo(spellID)
-    if name then
-    	return name
-    else
-      self:Print("|cffff0000WARNING: Spell ID ["..tostring(spellID).."] does not exist!|r")
-    end
+	local name = GetSpellInfo(spellID)
+	if name then
+		return name
+	else
+	  self:Print("|cffff0000WARNING: Spell ID ["..tostring(spellID).."] does not exist!|r")
+	end
 end
 
 function ProcScience:PopulateSources()
