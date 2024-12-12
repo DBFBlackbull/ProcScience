@@ -1,4 +1,4 @@
-local L = {}
+L = {}
 
 L.TARGET_SELF = 1
 L.TARGET_ENEMY = 2

@@ -1,10 +1,9 @@
-local L = {}
 local VERSION = "1.0"
 local COMMIT_HASH = "f90c97f28d146b1ad7781d13ece3860d28f7b3db"
 local SHORT_COMMIT_HASH = "f90c97f"
 local ProcScience = CreateFrame("Frame")
 
-local ProcScienceStats = ProcScienceStats or { version = VERSION, items = {} }
+local ProcScienceStats = { version = VERSION, items = {} }
 
 local function dump(o)
 	if type(o) == 'table' then
@@ -40,8 +39,8 @@ end
 function ProcScience:PopulateSources()
 	self.sources = { Damage = {}, AreaEffect = {}, Aura = {} }
 	for k, v in pairs(L[self.player.class]) do
-		for i, spellID in ipairs(v) do
-			self.sources[k][self:SpellName(spellID)] = true
+		for i, spellName in ipairs(v) do
+			self.sources[k][spellName] = true
 		end
 	end
 end
@@ -128,11 +127,12 @@ function ProcScience:CheckProcEvent(timestamp, subEvent, destGUID, spellName)
 end
 
 function ProcScience:OnAddonLoaded()
+	local _, unitClass = UnitClass("player")
 	self.player = { 
 		name = UnitName("player"),
-		guid = UnitGUID("player"),
-		level = UnitLevel("player"),
-		class = select(2, UnitClass("player")),
+		--guid = UnitGUID("player"),
+		level = UnitLevel("player"), -- fluff info. Never used
+		class = unitClass,
 		disarmed = false
 	}
 
@@ -331,9 +331,7 @@ function ProcScience:Dump()
 end
 
 ProcScience:SetScript("OnEvent", function(self, event, addonName)
-	if event == "ADDON_LOADED" and addonName == "ProcScience" then
-		self:OnAddonLoaded()
-	elseif event == "PLAYER_ENTERING_WORLD" or event == "PLAYER_EQUIPMENT_CHANGED" then
+	if event == "PLAYER_ENTERING_WORLD" or event == "PLAYER_EQUIPMENT_CHANGED" then
 		self:OnEquipmentChanged()
 	elseif event == "COMBAT_LOG_EVENT_UNFILTERED" then
 		self:OnCombatLogEvent()
@@ -342,12 +340,12 @@ ProcScience:SetScript("OnEvent", function(self, event, addonName)
 	end
 end)
 
-ProcScience:RegisterEvent("ADDON_LOADED")
 ProcScience:RegisterEvent("PLAYER_ENTERING_WORLD")
 ProcScience:RegisterEvent("PLAYER_EQUIPMENT_CHANGED")
 ProcScience:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 ProcScience:RegisterEvent("LOSS_OF_CONTROL_ADDED")
 ProcScience:RegisterEvent("LOSS_OF_CONTROL_UPDATE")
+ProcScience:OnAddonLoaded()
 
 SLASH_PROCS1 = "/procs"
 SlashCmdList["PROCS"] = function(msg)
