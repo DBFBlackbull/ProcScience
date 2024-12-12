@@ -4,7 +4,7 @@ local COMMIT_HASH = "f90c97f28d146b1ad7781d13ece3860d28f7b3db"
 local SHORT_COMMIT_HASH = "f90c97f"
 local ProcScience = CreateFrame("Frame")
 
-ProcScienceStats = ProcScienceStats or { version = VERSION, items = {} }
+local ProcScienceStats = ProcScienceStats or { version = VERSION, items = {} }
 
 local function dump(o)
 	if type(o) == 'table' then
