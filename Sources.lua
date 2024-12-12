@@ -1,4 +1,4 @@
-local A, L = ...
+local L = {}
 
 L.WARRIOR = {
 	Damage = { 

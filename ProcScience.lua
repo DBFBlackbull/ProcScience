@@ -1,4 +1,4 @@
-local A, L = ...
+local L = {}
 local VERSION = "1.0"
 local COMMIT_HASH = "f90c97f28d146b1ad7781d13ece3860d28f7b3db"
 local SHORT_COMMIT_HASH = "f90c97f"
@@ -24,8 +24,8 @@ local function dump(o)
 	end
 end
 
-function ProcScience:Print(...)
-	print("|cffF0E68C[ProcScience]|cffFFFFFF:", ...)
+function ProcScience:Print(string)
+	DEFAULT_CHAT_FRAME:AddMessage("|cffF0E68C[ProcScience]|cffFFFFFF:"..string)
 end
 
 function ProcScience:SpellName(spellID)
@@ -330,8 +330,8 @@ function ProcScience:Dump()
 	self:Print("procs = "..dump(self.tracked))
 end
 
-ProcScience:SetScript("OnEvent", function(self, event, ...)
-	if event == "ADDON_LOADED" and ... == "ProcScience" then
+ProcScience:SetScript("OnEvent", function(self, event, addonName)
+	if event == "ADDON_LOADED" and addonName == "ProcScience" then
 		self:OnAddonLoaded()
 	elseif event == "PLAYER_ENTERING_WORLD" or event == "PLAYER_EQUIPMENT_CHANGED" then
 		self:OnEquipmentChanged()
