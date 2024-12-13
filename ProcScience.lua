@@ -3,6 +3,9 @@ local COMMIT_HASH = "f90c97f28d146b1ad7781d13ece3860d28f7b3db"
 local SHORT_COMMIT_HASH = "f90c97f"
 local ProcScience = CreateFrame("Frame")
 
+local INVSLOT_FIRST_EQUIPPED = 1
+local INVSLOT_LAST_EQUIPPED = 18
+
 local ProcScienceStats = { version = VERSION, items = {} }
 
 local function dump(o)
@@ -27,19 +30,10 @@ function ProcScience:Print(string)
 	DEFAULT_CHAT_FRAME:AddMessage("|cffF0E68C[ProcScience]|cffFFFFFF:"..string)
 end
 
-function ProcScience:SpellName(spellID)
-	local name = GetSpellInfo(spellID)
-	if name then
-		return name
-	else
-	  self:Print("|cffff0000WARNING: Spell ID ["..tostring(spellID).."] does not exist!|r")
-	end
-end
-
 function ProcScience:PopulateSources()
 	self.sources = { Damage = {}, AreaEffect = {}, Aura = {} }
 	for k, v in pairs(L[self.player.class]) do
-		for i, spellName in ipairs(v) do
+		for spellName, spellID in pairs(v) do
 			self.sources[k][spellName] = true
 		end
 	end
@@ -49,7 +43,7 @@ function ProcScience:DetectItemProc(detected, itemID, slotID)
 	if itemID and L.Procs[itemID] then
 		local procInfo = L.Procs[itemID]
 		local spellID = procInfo.spellID
-		local spellName = self:SpellName(spellID)
+		local spellName = procInfo.spellName
 		local procStats
 
 		if ProcScienceStats.items[itemID] == nil then
@@ -57,7 +51,8 @@ function ProcScience:DetectItemProc(detected, itemID, slotID)
 		end
 
 		procStats = ProcScienceStats.items[itemID]
-		procStats.itemName = select(1, GetItemInfo(itemID)) or procInfo.itemName
+		local itemName = GetItemInfo(itemID)
+		procStats.itemName = itemName or procInfo.itemName
 		procStats.spellName = spellName
 		procStats.spellID = spellID
 
@@ -80,18 +75,40 @@ function ProcScience:DetectItemProc(detected, itemID, slotID)
 	end
 end
 
+function ProcScience:GetInventoryItemID(unit, slotID)
+	local itemLink = GetInventoryItemLink(unit, slotID)
+	if not itemLink then
+		return
+	end
+
+	local foundlink, _, linkItemID = string.find(itemLink, "(item:%d+)");
+	if not foundlink then
+		return
+	end
+
+	local foundID, _ , itemID = string.find(linkItemID, "(%d+)")
+	if not foundID then
+		return
+	end
+
+	return tonumber(itemID)
+end
+
 function ProcScience:DetectItems()
 	local detected = {}
 
 	for slotID = INVSLOT_FIRST_EQUIPPED, INVSLOT_LAST_EQUIPPED do
-		local itemID = GetInventoryItemID("player", slotID)
-		self:DetectItemProc(detected, itemID, slotID)
+		local itemID = self:GetInventoryItemID("player", slotID)
+		if itemID then
+			self:DetectItemProc(detected, itemID, slotID)
+		end
 	end
 	
 	if self.tracked ~= nil then
 		for k, v in pairs(detected) do
 			if self.tracked[k] == nil or self.tracked[k].filter ~= v.filter then
-				local itemName = select(1, GetItemInfo(v.itemID)) or v.info.itemName
+				local itemName = GetItemInfo(v.itemID)
+				itemName = itemName or v.info.itemName
 				self:Print("Tracking "..itemName.." in "..(v.filter or "both hands"))
 			end
 		end
@@ -221,7 +238,7 @@ function ProcScience:MigrateOldStats()
 					local procInfo = L.Procs[itemID]
 					if procInfo ~= nil and ProcScienceStats[itemID] == nil then
 						v.spellID = procInfo.spellID
-						v.spellName = self:SpellName(procInfo.spellID)
+						v.spellName = procInfo.spellName
 						v.itemID = nil
 						items[itemID] = v
 						ProcScienceStats[k] = nil
@@ -267,7 +284,7 @@ function ProcScience:PrintStats()
 							end
 							attackSpeed = tonumber(speed) or 0
 							break
-						end					
+						end
 					end
 					GameTooltip:Hide()
 				end
@@ -330,22 +347,39 @@ function ProcScience:Dump()
 	self:Print("procs = "..dump(self.tracked))
 end
 
-ProcScience:SetScript("OnEvent", function(self, event, addonName)
-	if event == "PLAYER_ENTERING_WORLD" or event == "PLAYER_EQUIPMENT_CHANGED" then
-		self:OnEquipmentChanged()
-	elseif event == "COMBAT_LOG_EVENT_UNFILTERED" then
-		self:OnCombatLogEvent()
-	elseif event == "LOSS_OF_CONTROL_ADDED" or event == "LOSS_OF_CONTROL_UPDATE" then
-		self:OnLossOfControlEvent()
+function ProcScience:OnEvent()
+	--ProcScience:Print("event "..(event or "nil"))
+	--ProcScience:Print("arg1 "..(arg1 or "nil"))
+
+	if event == "ADDON_LOADED" and arg1 == "ProcScience" then
+		return ProcScience:OnAddonLoaded()
 	end
-end)
+
+	if event == "PLAYER_ENTERING_WORLD" then
+		return ProcScience:OnEquipmentChanged()
+	end
+
+	if event == "UNIT_INVENTORY_CHANGED" and arg1 == "player" then
+		return ProcScience:OnEquipmentChanged()
+	end
+
+	if event == "COMBAT_LOG_EVENT_UNFILTERED" then
+		return ProcScience:OnCombatLogEvent()
+	end
+
+	if event == "LOSS_OF_CONTROL_ADDED" or event == "LOSS_OF_CONTROL_UPDATE" then
+		ProcScience:OnLossOfControlEvent()
+	end
+end
+
+ProcScience:SetScript("OnEvent", ProcScience.OnEvent)
 
 ProcScience:RegisterEvent("PLAYER_ENTERING_WORLD")
-ProcScience:RegisterEvent("PLAYER_EQUIPMENT_CHANGED")
+ProcScience:RegisterEvent("UNIT_INVENTORY_CHANGED")
 ProcScience:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 ProcScience:RegisterEvent("LOSS_OF_CONTROL_ADDED")
 ProcScience:RegisterEvent("LOSS_OF_CONTROL_UPDATE")
-ProcScience:OnAddonLoaded()
+ProcScience:RegisterEvent("ADDON_LOADED")
 
 SLASH_PROCS1 = "/procs"
 SlashCmdList["PROCS"] = function(msg)
