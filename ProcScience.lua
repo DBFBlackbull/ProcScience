@@ -161,10 +161,6 @@ function ProcScience:OnAddonLoaded()
 	self:MigrateOldStats()
 end
 
-function ProcScience:OnEquipmentChanged()
-	self:DetectItems()
-end
-
 function ProcScience:OnCombatLogEvent()
 	if next(self.tracked) ~= nil then
 		local timestamp, subEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID = CombatLogGetCurrentEventInfo()
@@ -356,11 +352,11 @@ function ProcScience:OnEvent()
 	end
 
 	if event == "PLAYER_ENTERING_WORLD" then
-		return ProcScience:OnEquipmentChanged()
+		return ProcScience:DetectItems()
 	end
 
 	if event == "UNIT_INVENTORY_CHANGED" and arg1 == "player" then
-		return ProcScience:OnEquipmentChanged()
+		return ProcScience:DetectItems()
 	end
 
 	if event == "COMBAT_LOG_EVENT_UNFILTERED" then
