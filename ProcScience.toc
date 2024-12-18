@@ -1,7 +1,7 @@
 ## Interface: 11200
 ## Title: ProcScience
 ## Notes: ProcScience
-## Author: magey
+## Author: magey, dbfblackbull
 ## Version: 1.0
 ## SavedVariablesPerCharacter: ProcScienceStats
 
