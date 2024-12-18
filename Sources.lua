@@ -20,7 +20,8 @@ L.WARRIOR = {
 		["Disarm"]       = 676,
 		["Rend"]         = 772,
 		["Sunder Armor"] = 7386,
-	}
+	},
+	GCDSpell = "Battle Shout"
 }
 
 L.PALADIN = {
@@ -30,7 +31,8 @@ L.PALADIN = {
 		["Judgement of Command"]  = 20467,
 	},
 	Aura = {
-	}
+	},
+	GCDSpell = "Holy Light"
 }
 
 L.ROGUE = {
@@ -50,7 +52,8 @@ L.ROGUE = {
 		["Garrote"]     = 703,
 		["Rupture"]     = 1943,
 		["Sap"]         = 6770,
-	}
+	},
+	GCDSpell = "Sinister Strike"
 }
 
 L.SHAMAN = {
@@ -58,5 +61,6 @@ L.SHAMAN = {
 		["Stormstrike"] = 17364
 	},
 	Aura = {
-	}
+	},
+	GCDSpell = "Lightning Bolt"
 }
