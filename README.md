@@ -4,6 +4,8 @@ This addon is a backport of the addon of the same name for the Classic 1.14 game
 It helps with tracking number of hits and procs from various items in Vanilla World of Warcraft.
 The addon calculates what the proc percentage chance of an item is and the estimated Procs-Per-Minute (PPM) of the item.
 
+**The addon is not perfect yet!** If you find any bugs or procs that are not being tracked or recoded, please let me know.
+
 ## Functionality
 
 The addon will show you what items you have equipped that are being tracked.
