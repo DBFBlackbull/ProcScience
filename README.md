@@ -4,6 +4,10 @@ This addon is a backport of the addon of the same name for the Classic 1.14 game
 It helps with tracking number of hits and procs from various items in Vanilla World of Warcraft.
 The addon calculates what the proc percentage chance of an item is and the estimated Procs-Per-Minute (PPM) of the item.
 
+![Tracking](https://https://github.com/DBFBlackbull/ProcScience/raw/master/img/proc-science-tracking.png)
+![Print Stats](https://https://github.com/DBFBlackbull/ProcScience/raw/master/img/proc-science-stats.png)
+![Proc notification](https://https://github.com/DBFBlackbull/ProcScience/raw/master/img/proc-science-notify.png)
+
 ## Functionality
 
 The addon will show you what items you have equipped that are being tracked.
