@@ -14,15 +14,11 @@ Your statistics are saved between game sessions per character, so you can log ou
 
 ## Limitation
 
-The 1.12.1 client is limited in the information given in the combat log which causes this version to be less rigours than the 1.14 counterpart.
-Furthermore this addon only works for the English client.
-No work have gone into localization.
+ - The 1.12.1 client is limited in the information given in the combat log which causes this version to be less rigours than the 1.14 counterpart.
+ - This addon only works for the English client. No work have gone into localization.
+ - The addon only tracks a handful of manually added items, so if your item of interest is not being tracked, please either modify the `Procs.lua` file or create an issue on github.
 
-### Item list
-
-The addon only tracks a handful of manually added items, so if your item of interest is not being tracked, please either modify the `Procs.lua` file or create an issue on github.
-
-### Errors and uncertainty
+## Errors and uncertainty
 
 Due to limitations on the 1.12.1 client information about combat log events are limit.
 The information available is in the form of:
@@ -32,7 +28,7 @@ The information available is in the form of:
 
 This can cause potential error sources to the data.
 
-####Items that proc extra attacks are safe
+### Items that proc extra attacks are safe
 
 These include:
  - [[Hand of Justice]](https://www.wowhead.com/classic/item=11815/hand-of-justice)
@@ -42,7 +38,7 @@ These include:
 Since these procs only affect your character and contains the wording "extra attack".
 They can be detected without error.
 
-####Items that proc a buff are mostly safe:
+### Items that proc a buff are mostly safe:
 
 These include:
  - [[Destiny]](https://www.wowhead.com/classic/item=647/destiny)
@@ -53,7 +49,7 @@ These procs rely on having a unique name for the buff they provide.
 If a weapons buff was called "Mark of the Wild", it would be indistinguishable from a druid buffing the player and would cause a proc to be tracked when it did not happen.
 Luckily most item buffs are uniquely named so it is rarely a problem.
 
-####Items that proc on the opponent are likely unsafe.
+### Items that proc on the opponent are likely unsafe.
 
 These include:
  - [[Nightfall]](https://www.wowhead.com/classic/item=19169/nightfall) proccing [Spell Vulnerability](https://www.wowhead.com/classic/spell=23605/spell-vulnerability)
