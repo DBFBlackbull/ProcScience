@@ -221,45 +221,45 @@ function ProcScience:OnTargetChanged()
 	self.player.target = UnitName("target")
 end
 
-function ProcScience:OnCombatLogEvent()
-	if next(self.tracked) ~= nil then
-		local timestamp, subEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID = CombatLogGetCurrentEventInfo()
-		if sourceGUID == self.player.guid then
-			if subEvent == "SWING_DAMAGE" then
-				local amount, overkill, school, resisted, blocked, absorbed, critical, glancing, crushing, isOffHand = select(12, CombatLogGetCurrentEventInfo())
-				self:UpdateProcHits("Melee", isOffHand)
-			elseif subEvent:find("^SPELL") ~= nil then
-				local spellID, spellName, spellSchool = select(12, CombatLogGetCurrentEventInfo())
-				if subEvent == "SPELL_CAST_SUCCESS" then
-					if self.sources.Aura[spellName] then
-						self:UpdateProcHits(spellName)
-					elseif self.sources.AreaEffect[spellName] then
-						self.pendingAE[spellName] = true
-					end
-				elseif subEvent == "SPELL_DAMAGE" then
-					if self.sources.Damage[spellName] then
-						self:UpdateProcHits(spellName)
-					elseif self.sources.AreaEffect[spellName] then
-						self:UpdateProcHits(spellName)
-						self.pendingAE[spellName] = false
-					else
-						self:CheckProcEvent(timestamp, subEvent, destGUID, spellName)
-					end
-				elseif subEvent == "SPELL_MISSED" then
-					if self.sources.Aura[spellName] then
-						self:UpdateProcHits(spellName, false, -1)
-					else
-						self:CheckProcEvent(timestamp, subEvent, destGUID, spellName)
-					end
-				else
-					self:CheckProcEvent(timestamp, subEvent, destGUID, spellName)
-				end
-			end
-		end
-	end
-end
+--function ProcScience:OnCombatLogEventOrg()
+--	if next(self.tracked) ~= nil then
+--		local timestamp, subEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID = CombatLogGetCurrentEventInfo()
+--		if sourceGUID == self.player.guid then
+--			if subEvent == "SWING_DAMAGE" then
+--				local amount, overkill, school, resisted, blocked, absorbed, critical, glancing, crushing, isOffHand = select(12, CombatLogGetCurrentEventInfo())
+--				self:UpdateProcHits("Melee", isOffHand)
+--			elseif subEvent:find("^SPELL") ~= nil then
+--				local spellID, spellName, spellSchool = select(12, CombatLogGetCurrentEventInfo())
+--				if subEvent == "SPELL_CAST_SUCCESS" then
+--					if self.sources.Aura[spellName] then
+--						self:UpdateProcHits(spellName)
+--					elseif self.sources.AreaEffect[spellName] then
+--						self.pendingAE[spellName] = true
+--					end
+--				elseif subEvent == "SPELL_DAMAGE" then
+--					if self.sources.Damage[spellName] then
+--						self:UpdateProcHits(spellName)
+--					elseif self.sources.AreaEffect[spellName] then
+--						self:UpdateProcHits(spellName)
+--						self.pendingAE[spellName] = false
+--					else
+--						self:CheckProcEvent(timestamp, subEvent, destGUID, spellName)
+--					end
+--				elseif subEvent == "SPELL_MISSED" then
+--					if self.sources.Aura[spellName] then
+--						self:UpdateProcHits(spellName, false, -1)
+--					else
+--						self:CheckProcEvent(timestamp, subEvent, destGUID, spellName)
+--					end
+--				else
+--					self:CheckProcEvent(timestamp, subEvent, destGUID, spellName)
+--				end
+--			end
+--		end
+--	end
+--end
 
-function ProcScience:OnCombatLogEvent2()
+function ProcScience:OnCombatLogEvent()
 	if next(self.tracked) == nil then
 		return
 	end
@@ -308,33 +308,6 @@ function ProcScience:OnCombatLogEvent2()
 		local _, _, unit, spellName = string.find(arg1, "(You) gain %d extra attacks? through (.+)%.")
 		return self:CheckProcEvent(timestamp, self.player.name, spellName)
 	end
-	--if subEvent:find("^SPELL") ~= nil then
-	--	local spellID, spellName, spellSchool = select(12, CombatLogGetCurrentEventInfo())
-	--	if subEvent == "SPELL_CAST_SUCCESS" then
-	--		if self.sources.Aura[spellName] then
-	--			self:UpdateProcHits(spellName)
-	--		elseif self.sources.AreaEffect[spellName] then
-	--			self.pendingAE[spellName] = true
-	--		end
-	--	elseif subEvent == "SPELL_DAMAGE" then
-	--		if self.sources.Damage[spellName] then
-	--			self:UpdateProcHits(spellName)
-	--		elseif self.sources.AreaEffect[spellName] then
-	--			self:UpdateProcHits(spellName)
-	--			self.pendingAE[spellName] = false
-	--		else
-	--			self:CheckProcEvent(timestamp, subEvent, destGUID, spellName)
-	--		end
-	--	elseif subEvent == "SPELL_MISSED" then
-	--		if self.sources.Aura[spellName] then
-	--			self:UpdateProcHits(spellName, false, -1)
-	--		else
-	--			self:CheckProcEvent(timestamp, subEvent, destGUID, spellName)
-	--		end
-	--	else
-	--		self:CheckProcEvent(timestamp, subEvent, destGUID, spellName)
-	--	end
-	--end
 end
 
 
@@ -470,7 +443,7 @@ function ProcScience:OnEvent()
 			event == "CHAT_MSG_SPELL_PERIODIC_CREATURE_DAMAGE" or
 			event == "CHAT_MSG_SPELL_SELF_BUFF" or
 			event == "CHAT_MSG_SPELL_PERIODIC_SELF_BUFFS" then
-		return ProcScience:OnCombatLogEvent2()
+		return ProcScience:OnCombatLogEvent()
 	end
 
 	if event == "LOSS_OF_CONTROL_ADDED" or event == "LOSS_OF_CONTROL_UPDATE" then
