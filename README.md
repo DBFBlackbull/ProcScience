@@ -35,8 +35,7 @@ These include:
  - [[Ironfoe]](https://www.wowhead.com/classic/item=11684/ironfoe)
  - [[Thrash Blade]](https://www.wowhead.com/classic/item=17705/thrash-blade)
 
-Since these procs only affect your character and contains the wording "extra attack".
-They can be detected without error.
+Since these procs only affect your character and contains the wording "extra attack" they can be detected without error.
 
 ### Items that proc a buff are mostly safe:
 
@@ -61,13 +60,13 @@ Since the combat log event for these items are of the format:
  - `Winterfall Den Watcher is afflicted by Frostbolt.`
  - `Winterfall Den Watcher takes 75 fire damage from Firebolt.`
 
-these events cannot be reliable determined to come from the player character or from the characters weapon.
+These events cannot be reliable determined to come from the player character or from the characters weapon.
 Issues arise in the following situations:
- - If you are testing a [[Coldrage Dagger]](https://www.wowhead.com/classic/item=10761/coldrage-dagger) against a 'Winterfall Den Watcher' and a nearby Mage is also farming 'Winterfall Den Watcher' with [Frostbolt](https://www.wowhead.com/classic/spell=25304/frostbolt), then the addon cannot tell if the 'Winterfall Den Watcher' is afflicted by [[Coldrage Dagger]](https://www.wowhead.com/classic/item=10761/coldrage-dagger)[Frostbolt](https://www.wowhead.com/classic/spell=13439/frostbolt) or Mage [Frostbolt]([[Coldrage Dagger]](https://www.wowhead.com/classic/item=10761/coldrage-dagger)). Thus, incorrect data will be tracked.
- - The same goes for [[Alcor's Sunrazor]](https://www.wowhead.com/classic/item=14555/alcors-sunrazor) proccing [Firebolt](https://www.wowhead.com/classic/spell=18833/firebolt) and a Warlock Imp using [Firebolt](https://www.wowhead.com/classic/spell=11763/firebolt).
- - If multiple people are testing [[Nightfall]](https://www.wowhead.com/classic/item=19169/nightfall) against mobs of the same name, then a proc for one character will count towards everyone testing. 
+ - If you are testing a [[Coldrage Dagger]](https://www.wowhead.com/classic/item=10761/coldrage-dagger) against a 'Winterfall Den Watcher' and a nearby Mage is also farming 'Winterfall Den Watcher' with [Frostbolt](https://www.wowhead.com/classic/spell=25304/frostbolt), then the addon cannot tell if the 'Winterfall Den Watcher' is afflicted by [[Coldrage Dagger]](https://www.wowhead.com/classic/item=10761/coldrage-dagger)'s [Frostbolt](https://www.wowhead.com/classic/spell=13439/frostbolt) or Mage [Frostbolt](https://www.wowhead.com/classic/spell=25304/frostbolt). Thus, incorrect data will be tracked.
+ - The same goes for [[Alcor's Sunrazor]](https://www.wowhead.com/classic/item=14555/alcors-sunrazor) proccing [Firebolt](https://www.wowhead.com/classic/spell=18833/firebolt) being indistinguishable from a Warlock Imp using [Firebolt](https://www.wowhead.com/classic/spell=11763/firebolt).
+ - If multiple people are testing [[Nightfall]](https://www.wowhead.com/classic/item=19169/nightfall) against mobs of the same name, then a proc of [Spell Vulnerability](https://www.wowhead.com/classic/spell=23605/spell-vulnerability) for one character will count as every player's Nightfall just procced. 
 
-Therefore, it is best to test these weapons in a safe environment, away from classes that can cause errors.
+Therefore, it is best to test these weapons in a safe environment. Either alone or away from classes that can cause errors.
 
 # ProcScience from Classic WoW Armaments
 
