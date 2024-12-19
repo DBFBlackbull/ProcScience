@@ -8,6 +8,8 @@ The addon calculates what the proc percentage chance of an item is and the estim
 ![Print Stats](https://https://github.com/DBFBlackbull/ProcScience/raw/master/img/proc-science-stats.png)
 ![Proc notification](https://https://github.com/DBFBlackbull/ProcScience/raw/master/img/proc-science-notify.png)
 
+**The addon is not perfect yet!** If you find any bugs or procs that are not being tracked or recoded, please let me know.
+
 ## Functionality
 
 The addon will show you what items you have equipped that are being tracked.
