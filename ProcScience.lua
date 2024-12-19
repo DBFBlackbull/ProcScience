@@ -283,7 +283,8 @@ function ProcScience:OnCombatLogEvent()
 	end
 
 	-- Track spells on enemies
-	if event == "CHAT_MSG_SPELL_PERIODIC_CREATURE_DAMAGE" then
+	if event == "CHAT_MSG_SPELL_PERIODIC_CREATURE_DAMAGE" or
+			event == CHAT_MSG_SPELL_PERIODIC_HOSTILEPLAYER_DAMAGE then
 		local _, _, unit, spellName = string.find(arg1, "(.+) is afflicted by (.+)%.")
 		if unit ~= self.player.target then
 			return
@@ -441,6 +442,7 @@ function ProcScience:OnEvent()
 	if event == "CHAT_MSG_COMBAT_SELF_HITS" or
 			event == "CHAT_MSG_SPELL_SELF_DAMAGE" or
 			event == "CHAT_MSG_SPELL_PERIODIC_CREATURE_DAMAGE" or
+			event == "CHAT_MSG_SPELL_PERIODIC_HOSTILEPLAYER_DAMAGE" or
 			event == "CHAT_MSG_SPELL_SELF_BUFF" or
 			event == "CHAT_MSG_SPELL_PERIODIC_SELF_BUFFS" then
 		return ProcScience:OnCombatLogEvent()
@@ -460,6 +462,7 @@ ProcScience:RegisterEvent("CHAT_MSG_COMBAT_SELF_MISSES")
 ProcScience:RegisterEvent("CHAT_MSG_COMBAT_SELF_HITS") -- detect my hits
 ProcScience:RegisterEvent("CHAT_MSG_SPELL_SELF_DAMAGE") -- detect my stormstrike
 ProcScience:RegisterEvent("CHAT_MSG_SPELL_PERIODIC_CREATURE_DAMAGE") -- can detect nightfall
+ProcScience:RegisterEvent("CHAT_MSG_SPELL_PERIODIC_HOSTILEPLAYER_DAMAGE") -- can detect nightfall
 ProcScience:RegisterEvent("PLAYER_TARGET_CHANGED")
 
 ProcScience:RegisterEvent("CHAT_MSG_SPELL_SELF_BUFF")
