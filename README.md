@@ -26,6 +26,9 @@ Your statistics are saved between game sessions per character, so you can log ou
 
 ## Errors and uncertainty
 
+The 1.12.1 client gives no information about if the main hand or offhand made an auto attack.
+Therefore all testing should be done with only 1 weapon equiped in the main hand.
+
 Due to limitations on the 1.12.1 client information about combat log events are limit.
 The information available is in the form of:
  - `You gain 1 extra attack through Hand of Justice.`
