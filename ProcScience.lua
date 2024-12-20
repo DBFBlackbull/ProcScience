@@ -127,6 +127,10 @@ function ProcScience:DetectItems()
 end
 
 function ProcScience:IsGCD()
+	if not self.player.gcdSpellSlot then
+		return false
+	end
+
 	local _, duration = GetSpellCooldown(self.player.gcdSpellSlot,0)
 	return duration == 1.5
 end
@@ -207,6 +211,9 @@ function ProcScience:OnAddonLoaded()
 end
 
 function ProcScience:SetGlobalCooldownSpellSlot()
+	if not L[self.player.class] then
+		return
+	end
 	local gcdSpell = L[self.player.class].GCDSpell
 	for i = 1, 200 do
 		local spellName, _ = GetSpellName(i,0)
