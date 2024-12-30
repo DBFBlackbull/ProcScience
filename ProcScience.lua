@@ -165,7 +165,7 @@ function ProcScience:CheckProcEvent(timestamp, unit, spellName)
 	end
 	local procTarget = proc.info.events.target
 	if procTarget == L.TARGET_SELF and unit == self.player.name then
-		SendChatMessage(procMessage, "SAY")
+		--SendChatMessage(procMessage, "SAY")
 		proc.stats.procs = proc.stats.procs + 1
 		proc.timestamp = timestamp
 		if isGCD then
@@ -175,7 +175,7 @@ function ProcScience:CheckProcEvent(timestamp, unit, spellName)
 	end
 
 	if procTarget == L.TARGET_ENEMY and unit == self.player.target then
-		SendChatMessage(procMessage, "SAY")
+		--SendChatMessage(procMessage, "SAY")
 		proc.stats.procs = proc.stats.procs + 1
 		proc.timestamp = timestamp
 		if isGCD then
@@ -400,6 +400,8 @@ function ProcScience:ResetAll()
 	for itemID, stats in pairs(ProcScienceStats.items) do
 		stats.hits = 0
 		stats.procs = 0
+		stats.gcdHits = 0
+		stats.gcdProcs = 0
 	end
 end
 
@@ -409,6 +411,8 @@ function ProcScience:ResetTracked()
 		local stats = ProcScienceStats.items[stats.itemID]
 		stats.hits = 0
 		stats.procs = 0
+		stats.gcdHits = 0
+		stats.gcdProcs = 0
 	end
 end
 
