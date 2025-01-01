@@ -58,6 +58,7 @@ If a weapons buff was called "Mark of the Wild", it would be indistinguishable f
 Luckily most item buffs are uniquely named so it is rarely a problem.
 
 **If a buff is refreshed then it is not detected by the addon!**
+
 The 1.12 combat log only reports if a player gets a new buff.
 If an exiting buff, like [[Destiny]](https://www.wowhead.com/classic/spell=17152/destiny) has 2 seconds left and is refreshed, then no combat log event is posted, and therefore no proc is be detected.
 
@@ -83,6 +84,7 @@ Therefore, it is best to test these weapons in a safe environment.
 Either alone or away from classes that can cause errors.
 
 **If a debuff is refreshed then it is not detected by the addon!**
+
 The 1.12 combat log only reports if a unit gets a new debuff.
 If an exiting debuff, like [[Spell Vulnerability]](https://www.wowhead.com/classic/spell=23605/spell-vulnerability) has 2 seconds left and is refreshed, then no combat log event is posted, and therefore no proc is be detected.
 
