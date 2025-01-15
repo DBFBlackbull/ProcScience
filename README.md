@@ -26,6 +26,9 @@ Your statistics are saved between game sessions per character, so you can log ou
 
 ## Errors and uncertainty
 
+The 1.12.1 client gives no information about if the main hand or offhand made an auto attack.
+Therefore all testing should be done with only 1 weapon equiped in the main hand.
+
 Due to limitations on the 1.12.1 client information about combat log events are limit.
 The information available is in the form of:
  - `You gain 1 extra attack through Hand of Justice.`
@@ -43,7 +46,7 @@ These include:
 
 Since these procs only affect your character and contains the wording "extra attack" they can be detected without error.
 
-### Items that proc a buff are mostly safe:
+### Items that proc a buff are somewhat reliable:
 
 These include:
  - [[Destiny]](https://www.wowhead.com/classic/item=647/destiny)
@@ -53,6 +56,11 @@ These include:
 These procs rely on having a unique name for the buff they provide.
 If a weapons buff was called "Mark of the Wild", it would be indistinguishable from a druid buffing the player and would cause a proc to be tracked when it did not happen.
 Luckily most item buffs are uniquely named so it is rarely a problem.
+
+**If a buff is refreshed then it is not detected by the addon!**
+
+The 1.12 combat log only reports if a player gets a new buff.
+If an exiting buff, like [[Destiny]](https://www.wowhead.com/classic/spell=17152/destiny), has 2 seconds left and is refreshed, then no combat log event is posted, and therefore no proc is be detected.
 
 ### Items that proc on the opponent are likely unsafe.
 
@@ -72,7 +80,13 @@ Issues arise in the following situations:
  - The same goes for [[Alcor's Sunrazor]](https://www.wowhead.com/classic/item=14555/alcors-sunrazor) proccing [Firebolt](https://www.wowhead.com/classic/spell=18833/firebolt) being indistinguishable from a Warlock Imp using [Firebolt](https://www.wowhead.com/classic/spell=11763/firebolt).
  - If multiple people are testing [[Nightfall]](https://www.wowhead.com/classic/item=19169/nightfall) against mobs of the same name, then a proc of [Spell Vulnerability](https://www.wowhead.com/classic/spell=23605/spell-vulnerability) for one character will count as every player's Nightfall just procced. 
 
-Therefore, it is best to test these weapons in a safe environment. Either alone or away from classes that can cause errors.
+Therefore, it is best to test these weapons in a safe environment.
+Either alone or away from classes that can cause errors.
+
+**If a debuff is refreshed then it is not detected by the addon!**
+
+The 1.12 combat log only reports if a unit gets a new debuff.
+If an exiting debuff, like [[Spell Vulnerability]](https://www.wowhead.com/classic/spell=23605/spell-vulnerability), has 2 seconds left and is refreshed, then no combat log event is posted, and therefore no proc is be detected.
 
 # ProcScience from Classic WoW Armaments
 
