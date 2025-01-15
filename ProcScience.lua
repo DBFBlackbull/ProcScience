@@ -43,6 +43,9 @@ end
 
 function ProcScience:PopulateSources()
 	self.sources = { Damage = {}, AreaEffect = {}, Aura = {} }
+	if L[self.player.class] == nil then
+		return
+	end
 	for k, v in pairs(L[self.player.class]) do
 		if type(v) == 'table' then
 			for spellName, spellID in pairs(v) do
