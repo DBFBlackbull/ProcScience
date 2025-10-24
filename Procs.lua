@@ -72,6 +72,7 @@ L.Procs = {
 	-- Target-applied events
 	[811]    = { itemName = "Axe of the Deep Woods", attackSpeed = 2.7, spellID = 18104, spellName = "Wrath", school = "Nature", events = L.Events.Damage },
 	[5756]   = { itemName = "Sliverblade", attackSpeed = 1.4, spellID = 18398, spellName = "Frost Blast", school = "Frost", events = L.Events.Damage },
+	[7959]   = { itemName = "Blight", attackSpeed = 2.7, spellID = 9796, spellName = "Blight", school = "Nature", events = L.Events.Damage },
 	[10761]  = { itemName = "Coldrage Dagger", attackSpeed = 1.5, spellID = 13439, spellName = "Frostbolt", school = "Frost", events = L.Events.Damage },
 	[12592]  = { itemName = "Blackblade of Shahram", attackSpeed = 3.5, spellID = 16602, spellName = "Shahram", school = "Arcane", events = L.Events.Summon },
 	[12798]  = { itemName = "Annihilator", attackSpeed = 1.7, spellID = 16928, spellName = "Armor Shatter", school = "Shadow", events = L.Events.TargetStackingAura },
