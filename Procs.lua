@@ -11,7 +11,7 @@ L.Events = {
 	ExtraAttacks = {
 		target = L.TARGET_SELF,
 		trigger = L.TRIGGER_ON_CAST,
-		SPELL_EXTRA_ATTACKS = true
+		CHAT_MSG_SPELL_SELF_BUFF = true
 	},
 	SelfAura = {
 		target = L.TARGET_SELF,
@@ -29,23 +29,19 @@ L.Events = {
 	TargetAura = {
 		target = L.TARGET_ENEMY,
 		trigger = L.TRIGGER_ON_HIT,
-		SPELL_AURA_APPLIED = true,
-		SPELL_AURA_REFRESH = true,
-		SPELL_MISSED = true
+		CHAT_MSG_SPELL_PERIODIC_CREATURE_DAMAGE = true,
+		CHAT_MSG_SPELL_PERIODIC_HOSTILEPLAYER_DAMAGE = true,
 	},
 	TargetStackingAura = {
 		target = L.TARGET_ENEMY,
 		trigger = L.TRIGGER_ON_HIT,
-		SPELL_AURA_APPLIED = true,
-		SPELL_AURA_APPLIED_DOSE = true,
-		SPELL_AURA_REFRESH = true,
-		SPELL_MISSED = true
+		CHAT_MSG_SPELL_PERIODIC_CREATURE_DAMAGE = true,
+		CHAT_MSG_SPELL_PERIODIC_HOSTILEPLAYER_DAMAGE = true,
 	},
 	Damage = {
 		target = L.TARGET_ENEMY,
 		trigger = L.TRIGGER_ON_HIT,
-		SPELL_DAMAGE = true,
-		SPELL_MISSED = true
+		CHAT_MSG_SPELL_SELF_DAMAGE = true, -- Handles both spell hit and miss
 	},
 	Summon = {
 		target = L.TARGET_ENEMY,

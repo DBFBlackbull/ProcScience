@@ -155,30 +155,22 @@ function ProcScience:UpdateProcHits(source, isOffHand, amount)
 	end
 end
 
-function ProcScience:CheckProcEvent(timestamp, unit, spellName)
+function ProcScience:CheckProcEvent(timestamp, event, unit, spellName)
 	local proc = self.tracked[spellName]
 	if proc == nil then
 		return
 	end
 
-	local isGCD = self:IsGCD()
-	local procMessage = proc.stats.itemName.." proced "..proc.stats.spellName
-	if isGCD then
-		procMessage = procMessage.." during Global Cooldown!"
-	end
-	local procTarget = proc.info.events.target
-	if procTarget == L.TARGET_SELF and unit == self.player.name then
-		--SendChatMessage(procMessage, "SAY")
-		proc.stats.procs = proc.stats.procs + 1
-		proc.timestamp = timestamp
-		if isGCD then
-			proc.stats.gcdProcs = proc.stats.gcdProcs + 1
-		end
+	if not proc.info.events[event] then
 		return
 	end
 
-	if procTarget == L.TARGET_ENEMY and unit == self.player.target then
-		--SendChatMessage(procMessage, "SAY")
+	local isGCD = self:IsGCD()
+	local procMessage = proc.stats.itemName.." proced "..proc.stats.spellName
+	local procTarget = proc.info.events.target
+	if procTarget == L.TARGET_SELF and unit == self.player.name or
+		procTarget == L.TARGET_ENEMY and unit == self.player.target then
+		SendChatMessage(procMessage, "SAY")
 		proc.stats.procs = proc.stats.procs + 1
 		proc.timestamp = timestamp
 		if isGCD then
@@ -281,25 +273,30 @@ function ProcScience:OnCombatLogEvent()
 		return self:UpdateProcHits("Melee", false)
 	end
 
-	-- Track special abilities like Stormstrike, Overpower, or Sinister Strike
+	-- Tracks special abilities like Stormstrike, Overpower, or Sinister Strike
+	-- Tracks damage procs like Sulfuras Fireball
+	-- Tracks both hits, crits, and full resists (miss)
 	if event == "CHAT_MSG_SPELL_SELF_DAMAGE" then
-		local _, _, spellHit = string.find(arg1, "Your (.+) hits")
-		local _, _, spellCrit = string.find(arg1, "Your (.+) crits")
-		local spellName = spellHit or spellCrit
+		ProcScience:Print(arg1)
+		local _, _, spellHit, unitHit = string.find(arg1, "Your (.+) hits (.+) for")
+		local _, _, spellCrit, unitCrit = string.find(arg1, "Your (.+) crits (.+) for ")
+		local _, _, spellResist, unitResist = string.find(arg1, "Your (.+) was resisted by (.+).")
+		local spellName = spellHit or spellCrit or spellResist
+		local unit = unitHit or unitCrit or unitResist
 		if self.sources.Damage[spellName] then
-			self:UpdateProcHits(spellName)
+			return self:UpdateProcHits(spellName)
 		end
-		return
+
+		return self:CheckProcEvent(timestamp, event, unit, spellName)
 	end
 
-	-- Track spells on enemies
+	-- Track debuffs on enemies
 	if event == "CHAT_MSG_SPELL_PERIODIC_CREATURE_DAMAGE" or
-			event == CHAT_MSG_SPELL_PERIODIC_HOSTILEPLAYER_DAMAGE then
-		local _, _, unit, spellName = string.find(arg1, "(.+) is afflicted by (.+)%.")
-		if unit ~= self.player.target then
-			return
+			event == "CHAT_MSG_SPELL_PERIODIC_HOSTILEPLAYER_DAMAGE" then
+		local _, _, unit, spellName, stacks = string.find(arg1, "(.+) is afflicted by (.+) %((%d+)%)%.")
+		if not unit and not spellName then
+			_, _, unit, spellName = string.find(arg1, "(.+) is afflicted by (.+)%.")
 		end
-
 		-- Track instant attack spells
 		if self.sources.Damage[spellName] then
 			return self:UpdateProcHits(spellName)
@@ -311,13 +308,13 @@ function ProcScience:OnCombatLogEvent()
 		--end
 
 		-- Track procs like Nightfall or Annihilator
-		self:CheckProcEvent(timestamp, unit, spellName)
+		self:CheckProcEvent(timestamp, event, unit, spellName)
 	end
 
 	-- Track extra attacks from Hand of Justice or Ironfoe
 	if event == "CHAT_MSG_SPELL_SELF_BUFF" then
 		local _, _, unit, spellName = string.find(arg1, "(You) gain %d extra attacks? through (.+)%.")
-		return self:CheckProcEvent(timestamp, self.player.name, spellName)
+		return self:CheckProcEvent(timestamp, event, self.player.name, spellName)
 	end
 end
 
