@@ -31,17 +31,19 @@ L.Events = {
 		trigger = L.TRIGGER_ON_HIT,
 		CHAT_MSG_SPELL_PERIODIC_CREATURE_DAMAGE = true,
 		CHAT_MSG_SPELL_PERIODIC_HOSTILEPLAYER_DAMAGE = true,
+		CHAT_MSG_SPELL_SELF_DAMAGE = true,
 	},
 	TargetStackingAura = {
 		target = L.TARGET_ENEMY,
 		trigger = L.TRIGGER_ON_HIT,
 		CHAT_MSG_SPELL_PERIODIC_CREATURE_DAMAGE = true,
 		CHAT_MSG_SPELL_PERIODIC_HOSTILEPLAYER_DAMAGE = true,
+		CHAT_MSG_SPELL_SELF_DAMAGE = true,
 	},
 	Damage = {
 		target = L.TARGET_ENEMY,
 		trigger = L.TRIGGER_ON_HIT,
-		CHAT_MSG_SPELL_SELF_DAMAGE = true, -- Handles both spell hit and miss
+		CHAT_MSG_SPELL_SELF_DAMAGE = true,
 	},
 	Summon = {
 		target = L.TARGET_ENEMY,
