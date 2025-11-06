@@ -11,7 +11,8 @@ L.Events = {
 	ExtraAttacks = {
 		target = L.TARGET_SELF,
 		trigger = L.TRIGGER_ON_CAST,
-		CHAT_MSG_SPELL_SELF_BUFF = true
+		CHAT_MSG_SPELL_SELF_BUFF = true,
+		UNIT_CASTEVENT = true -- superwow
 	},
 	SelfAura = {
 		target = L.TARGET_SELF,
@@ -44,6 +45,7 @@ L.Events = {
 		target = L.TARGET_ENEMY,
 		trigger = L.TRIGGER_ON_HIT,
 		CHAT_MSG_SPELL_SELF_DAMAGE = true,
+		UNIT_CASTEVENT = true -- superwow
 	},
 	Summon = {
 		target = L.TARGET_ENEMY,
