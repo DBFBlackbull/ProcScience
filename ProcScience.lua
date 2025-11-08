@@ -2,6 +2,7 @@ local VERSION = "1.0"
 local COMMIT_HASH = "f90c97f28d146b1ad7781d13ece3860d28f7b3db"
 local SHORT_COMMIT_HASH = "f90c97f"
 local ProcScience = CreateFrame("Frame")
+local L = ProcScience_L
 
 local INVSLOT_FIRST_EQUIPPED = 1
 local INVSLOT_LAST_EQUIPPED = 18
@@ -31,7 +32,7 @@ local function dump(o)
 end
 
 function ProcScience:Print(string)
-	DEFAULT_CHAT_FRAME:AddMessage("|cffF0E68C[ProcScience]|cffFFFFFF:"..string)
+	DEFAULT_CHAT_FRAME:AddMessage("|cffF0E68C[ProcScience]|cffFFFFFF: "..string)
 end
 
 function ProcScience:Dump()
@@ -80,7 +81,7 @@ function ProcScience:DetectItemProc(detected, itemID, slotID)
 			end
 		end
 	else
-		local proc = { info = procInfo, stats = procStats }
+		local proc = { itemID = itemID, info = procInfo, stats = procStats }
 		if slotID == 16 then
 			proc.filter = "main hand"
 		elseif slotID == 17 then
@@ -161,17 +162,22 @@ function ProcScience:CheckProcEvent(timestamp, event, unit, spellName)
 		return
 	end
 
-	if not proc.info.events[event] then
+	local events = proc.info.events
+	if self.superWowActive and proc.superWowEvents then
+		events = proc.info.superWowEvents
+	end
+
+	if not events[event] then
 		return
 	end
 
-	local procOnSelf = proc.info.events.target == L.TARGET_SELF and (unit == self.player.name or unit == self.player.guid)
-	local procOnTarget = proc.info.events.target == L.TARGET_ENEMY and (unit == self.player.target or unit == self.player.targetGuid)
+	local procOnSelf = events.target == L.TARGET_SELF and (unit == self.player.name or unit == self.player.guid)
+	local procOnTarget = events.target == L.TARGET_ENEMY and (unit == self.player.target or unit == self.player.targetGuid)
 	if procOnSelf or procOnTarget then
 		local isGCD = self:IsGCD()
 		local procMessage = proc.stats.itemLink.." proced "..proc.stats.spellName
 
-		SendChatMessage(procMessage, "SAY")
+		self:Print(procMessage)
 		proc.stats.procs = proc.stats.procs + 1
 		proc.timestamp = timestamp
 		if isGCD then
@@ -285,6 +291,11 @@ function ProcScience:OnUnitCastEvent(timestamp)
 	local spellID = arg4
 	local castDuration = arg5
 
+	--if spellID ~= 6603 then
+	--	local spellName = SpellInfo(spellID)
+	--	self:Print(format("caster: %s target: %s eventType: %s spell: %s (%s) castDuration: %s", casterGuid, targetGuid, eventType, spellName, spellID, castDuration))
+	--end
+
 	if casterGuid ~= self.player.guid then
 		return
 	end
@@ -298,7 +309,7 @@ function ProcScience:OnUnitCastEvent(timestamp)
 		return
 	end
 
-	return self:CheckProcEvent(timestamp, "superwowevent", targetGuid, spellName)
+	return self:CheckProcEvent(timestamp, event, targetGuid, spellName)
 end
 
 function ProcScience:OnCombatLogEvent(timestamp)
@@ -311,24 +322,26 @@ function ProcScience:OnCombatLogEvent(timestamp)
 		return self:UpdateProcHits("Melee", false)
 	end
 
-	-- Tracks special abilities like Stormstrike, Overpower, or Sinister Strike
-	-- Tracks damage procs like Sulfuras Fireball
-	-- Tracks both hits, crits, and full resists (miss)
 	if event == "CHAT_MSG_SPELL_SELF_DAMAGE" then
-		ProcScience:Print(arg1)
 		local _, _, spellHit, unitHit = string.find(arg1, "Your (.+) hits (.+) for")
 		local _, _, spellCrit, unitCrit = string.find(arg1, "Your (.+) crits (.+) for ")
-		local _, _, spellResist, unitResist = string.find(arg1, "Your (.+) was resisted by (.+).")
-		local spellName = spellHit or spellCrit or spellResist
-		local unit = unitHit or unitCrit or unitResist
+		local spellName = spellHit or spellCrit
+		local unit = unitHit or unitCrit
 		if self.sources.Damage[spellName] then
 			return self:UpdateProcHits(spellName)
 		end
 
+		-- handle phantom hits
+
+		local _, _, spellMiss, unitMiss = string.find(arg1, "Your (.+) missed (.+)%.")
+		local _, _, spellDodge, unitDodge = string.find(arg1, "Your (.+) was dodged by (.+)%.")
+		local _, _, spellParry, unitParry = string.find(arg1, "Your (.+) is parried by (.+)%.")
+		local _, _, spellResist, unitResist = string.find(arg1, "Your (.+) was resisted by (.+)%.")
+		spellName = spellName or spellMiss or spellDodge or spellParry or spellResist
+		unit = unit or unitMiss or unitDodge or unitParry or unitResist
 		return self:CheckProcEvent(timestamp, event, unit, spellName)
 	end
 
-	-- Track debuffs on enemies
 	if event == "CHAT_MSG_SPELL_PERIODIC_CREATURE_DAMAGE" or
 			event == "CHAT_MSG_SPELL_PERIODIC_HOSTILEPLAYER_DAMAGE" then
 		local _, _, unit, spellName, stacks = string.find(arg1, "(.+) is afflicted by (.+) %((%d+)%)%.")
@@ -345,13 +358,20 @@ function ProcScience:OnCombatLogEvent(timestamp)
 		--	return self:UpdateProcHits(spellName)
 		--end
 
-		-- Track procs like Nightfall or Annihilator
 		self:CheckProcEvent(timestamp, event, unit, spellName)
 	end
 
 	-- Track extra attacks from Hand of Justice or Ironfoe
 	if event == "CHAT_MSG_SPELL_SELF_BUFF" then
 		local _, _, unit, spellName = string.find(arg1, "(You) gain %d extra attacks? through (.+)%.")
+		return self:CheckProcEvent(timestamp, event, self.player.name, spellName)
+	end
+
+	if event == "CHAT_MSG_SPELL_PERIODIC_SELF_BUFFS" then
+		local _, _, unit, spellName, stacks = string.find(arg1, "(You) gain (.+) %((%d+)%)%.")
+		if not unit and not spellName then
+			_, _, unit, spellName = string.find(arg1, "(You) gain (.+)%.")
+		end
 		return self:CheckProcEvent(timestamp, event, self.player.name, spellName)
 	end
 end
@@ -409,7 +429,7 @@ end
 
 function ProcScience:ResetAll()
 	self:Print("Resetting all proc stats")
-	for itemID, stats in pairs(ProcScienceStats.items) do
+	for spellName, stats in pairs(ProcScienceStats.items) do
 		stats.hits = 0
 		stats.procs = 0
 		stats.gcdHits = 0
@@ -419,8 +439,8 @@ end
 
 function ProcScience:ResetTracked()
 	self:Print("Resetting currently tracked proc stats")
-	for itemID, _ in pairs(self.tracked) do
-		local stats = ProcScienceStats.items[itemID]
+	for spellName, proc in pairs(self.tracked) do
+		local stats = ProcScienceStats.items[proc.itemID]
 		stats.hits = 0
 		stats.procs = 0
 		stats.gcdHits = 0
@@ -474,15 +494,18 @@ function ProcScience:OnEvent()
 		return ProcScience:OnCombatLogEvent(timestamp)
 	end
 
-	if self.superWowActive then
-		if event == "UNIT_CASTEVENT" then
-			return ProcScience:OnUnitCastEvent(timestamp)
+	if event == "UNIT_CASTEVENT" then
+		return ProcScience:OnUnitCastEvent(timestamp)
+	end
+
+	if event == "RAW_COMBATLOG" then
+		if arg1 ~= "CHAT_MSG_COMBAT_SELF_HITS" and arg1 ~= "CHAT_MSG_COMBAT_SELF_MISSES" then
+			return ProcScience:Print(format("%s %s", arg1, arg2))
 		end
 	end
 
 	if event == "LOSS_OF_CONTROL_ADDED" or event == "LOSS_OF_CONTROL_UPDATE" then
-		ProcScience:OnLossOfControlEvent()
-		return
+		return ProcScience:OnLossOfControlEvent()
 	end
 end
 
@@ -510,12 +533,12 @@ function ProcScience:RegisterEvents()
 	-- track windfury "You gain Windfury weapon" attack power buff
 	-- track "You gain Holy Strength" crusader strength buff
 
-	--if self.superWowActive then
-	--	self:RegisterEvent("UNIT_CASTEVENT")
-	--	self:RegisterEvent("RAW_COMBATLOG")
+	if self.superWowActive then
+		self:RegisterEvent("UNIT_CASTEVENT")
+		--self:RegisterEvent("RAW_COMBATLOG")
 	--	self:UnregisterEvent("CHAT_MSG_SPELL_SELF_DAMAGE") -- handled by UNIT_CASTEVENT
 	--	self:UnregisterEvent("CHAT_MSG_SPELL_SELF_BUFF") -- handled by UNIT_CASTEVENT
-	--end
+	end
 
 	-- 1.14 events
 	self:RegisterEvent("LOSS_OF_CONTROL_ADDED")
@@ -539,4 +562,10 @@ SlashCmdList["PROCS"] = function(msg)
 			ProcScience:Reset(arg)
 		end
 	end
+end
+
+SLASH_ReloadUI1 = "/reloadui"
+SLASH_ReloadUI2 = "/reload"
+SlashCmdList["ReloadUI"] = function(msg, editbox)
+	ConsoleExec("reloadui")
 end

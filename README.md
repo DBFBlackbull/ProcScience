@@ -27,11 +27,12 @@ Your statistics are saved between game sessions per character, so you can log ou
 ## Errors and uncertainty
 
 The 1.12.1 client gives no information about if the main hand or offhand made an auto attack.
-Therefore all testing should be done with only 1 weapon equiped in the main hand.
+Therefore, all testing should be done with only 1 weapon equipped in the main hand.
 
 Due to limitations on the 1.12.1 client information about combat log events are limit.
 The information available is in the form of:
  - `You gain 1 extra attack through Hand of Justice.`
+ - `Your Fireball hits Winterfall Den Watcher for 302 Fire damage.`
  - `You gain Destiny.`
  - `Winterfall Den Watcher is afflicted by Spell Vulnerability.`
 
@@ -44,49 +45,90 @@ These include:
  - [[Ironfoe]](https://www.wowhead.com/classic/item=11684/ironfoe)
  - [[Thrash Blade]](https://www.wowhead.com/classic/item=17705/thrash-blade)
 
-Since these procs only affect your character and contains the wording "extra attack" they can be detected without error.
+These procs contains the wording "You gain X extra attack" and can be detected without error.
+
+### Items that proc direct damage are likely safe.
+
+These inclide:
+ - [[Sulfuras, Hand of Ragnaros]](https://www.wowhead.com/classic/item=17182/sulfuras-hand-of-ragnaros)
+ - [[Drake Talon Cleaver]](https://www.wowhead.com/classic/item=19353/drake-talon-cleaver)
+ - [[Coldrage Dagger]](https://www.wowhead.com/classic/item=10761/coldrage-dagger)
+
+These procs contains the wordings:
+ - `Your Fireball hits Winterfall Den Watcher for 302 Fire damage.`
+ - `Your Frostbolt crits Winterfall Den Watcher for 400 Frost damage.`
+ - `Your Fatal Wound is parried by Winterfall Den Watcher.`
+
+The procs always come from you, so other players cannot interfer.
+The procs rely on the spell name which is not unique, so if a Mage equips a [[Coldrage Dagger]](https://www.wowhead.com/classic/item=10761/coldrage-dagger) and casts Frostbolt, then every cast will be considered as a proc.
 
 ### Items that proc a buff are somewhat reliable:
 
 These include:
  - [[Destiny]](https://www.wowhead.com/classic/item=647/destiny)
- - [[The Untamed Blade]](https://www.wowhead.com/classic/item=19334/the-untamed-blade)
- - [[Felstriker]](https://www.wowhead.com/classic/item=12590/felstriker)
+ - [[Bonereaver's Edge]](https://www.wowhead.com/classic/item=17076/bonereavers-edge)
+ - [[Truesilver Champion]](https://www.wowhead.com/classic/item=7960/truesilver-champion)
 
-These procs rely on having a unique name for the buff they provide.
-If a weapons buff was called "Mark of the Wild", it would be indistinguishable from a druid buffing the player and would cause a proc to be tracked when it did not happen.
-Luckily most item buffs are uniquely named so it is rarely a problem.
+These procs contains the wordings:
+ - `You gain Destiny.`
+ - `You gain Bonereaver's Edge (2).`
+ - `You gain Holy Shield.`
 
-**If a buff is refreshed then it is not detected by the addon!**
+These procs rely on having a unique name for the buff they provide. Therefore, [[Destiny]](https://www.wowhead.com/classic/item=647/destiny) and [[Bonereaver's Edge]](https://www.wowhead.com/classic/item=17076/bonereavers-edge) are safe. [[Truesilver Champion]](https://www.wowhead.com/classic/item=7960/truesilver-champion) equipped by a Protection Paladin will count a proc every time [[Holy Shield]](https://www.wowhead.com/classic/spell=20928/holy-shield) (the paladin spell) is cast because it matches the name of the weapon proc [[Holy Shield]](https://www.wowhead.com/classic/spell=9800/holy-shield).
+
+**If a buff is refreshed it is not detected by the addon!**
 
 The 1.12 combat log only reports if a player gets a new buff.
-If an exiting buff, like [[Destiny]](https://www.wowhead.com/classic/spell=17152/destiny), has 2 seconds left and is refreshed, then no combat log event is posted, and therefore no proc is be detected.
+ - If an exiting buff, like [[Destiny]](https://www.wowhead.com/classic/spell=17152/destiny), has 2 seconds left and is refreshed, then no combat log event is posted, and therefore no proc can be detected.
+ - If an existing stackable buffs like [[Bonereaver's Edge]](https://www.wowhead.com/classic/spell=21153/bonereavers-edge) is at max stacks, has 2 seconds left, and is refreshed, then no combat log event is posted, and therefore no proc can be detected.
 
-### Items that proc on the opponent are likely unsafe.
+### Items that only proc a debuff on the target (no damage) are unsafe.
 
 These include:
  - [[Nightfall]](https://www.wowhead.com/classic/item=19169/nightfall) proccing [Spell Vulnerability](https://www.wowhead.com/classic/spell=23605/spell-vulnerability)
- - [[Coldrage Dagger]](https://www.wowhead.com/classic/item=10761/coldrage-dagger) proccing [Frostbolt](https://www.wowhead.com/classic/spell=13439/frostbolt)
- - [[Alcor's Sunrazor]](https://www.wowhead.com/classic/item=14555/alcors-sunrazor) proccing [Firebolt](https://www.wowhead.com/classic/spell=18833/firebolt)
+ - [[Annihilator]](https://www.wowhead.com/classic/item=12798/annihilator) proccing [[Armor Shatter]](https://www.wowhead.com/classic/spell=16928/armor-shatter)
+ - [[Bashguuder]](https://www.wowhead.com/classic/item=13204/bashguuder) proccing [[Puncture Armor]](https://www.wowhead.com/classic/spell=17315/puncture-armor)
 
 Since the combat log event for these items are of the format:
  - `Winterfall Den Watcher is afflicted by Spell Vulnerability.`
- - `Winterfall Den Watcher is afflicted by Frostbolt.`
- - `Winterfall Den Watcher takes 75 fire damage from Firebolt.`
+ - `Winterfall Den Watcher is afflicted by Armor Shatter (2).`
+ - `Winterfall Den Watcher is afflicted by Puncture Armor (3).`
 
 These events cannot be reliable determined to come from the player character or from the characters weapon.
-Issues arise in the following situations:
- - If you are testing a [[Coldrage Dagger]](https://www.wowhead.com/classic/item=10761/coldrage-dagger) against a 'Winterfall Den Watcher' and a nearby Mage is also farming 'Winterfall Den Watcher' with [Frostbolt](https://www.wowhead.com/classic/spell=25304/frostbolt), then the addon cannot tell if the 'Winterfall Den Watcher' is afflicted by [[Coldrage Dagger]](https://www.wowhead.com/classic/item=10761/coldrage-dagger)'s [Frostbolt](https://www.wowhead.com/classic/spell=13439/frostbolt) or Mage [Frostbolt](https://www.wowhead.com/classic/spell=25304/frostbolt). Thus, incorrect data will be tracked.
- - The same goes for [[Alcor's Sunrazor]](https://www.wowhead.com/classic/item=14555/alcors-sunrazor) proccing [Firebolt](https://www.wowhead.com/classic/spell=18833/firebolt) being indistinguishable from a Warlock Imp using [Firebolt](https://www.wowhead.com/classic/spell=11763/firebolt).
- - If multiple people are testing [[Nightfall]](https://www.wowhead.com/classic/item=19169/nightfall) against mobs of the same name, then a proc of [Spell Vulnerability](https://www.wowhead.com/classic/spell=23605/spell-vulnerability) for one character will count as every player's Nightfall just procced. 
+ - If multiple people are testing [[Nightfall]](https://www.wowhead.com/classic/item=19169/nightfall) against mobs of the same name, then a proc of [Spell Vulnerability](https://www.wowhead.com/classic/spell=23605/spell-vulnerability) for one character will count as every player's Nightfall just procced. In a raid with multiple Nightfall's this can easily occur.
 
-Therefore, it is best to test these weapons in a safe environment.
-Either alone or away from classes that can cause errors.
+Therefore, it is best to test these weapons in a safe environment alone, away from other players.
 
 **If a debuff is refreshed then it is not detected by the addon!**
 
 The 1.12 combat log only reports if a unit gets a new debuff.
-If an exiting debuff, like [[Spell Vulnerability]](https://www.wowhead.com/classic/spell=23605/spell-vulnerability), has 2 seconds left and is refreshed, then no combat log event is posted, and therefore no proc is be detected.
+ - If an existing debuff, like [[Spell Vulnerability]](https://www.wowhead.com/classic/spell=23605/spell-vulnerability), has 2 seconds left and is refreshed, then no combat log event is posted, and therefore no proc can be detected.
+ - If an existing stackable debuffs like [[Armor Shatter]](https://www.wowhead.com/classic/spell=16928/armor-shatter) or [[Puncture Armor]](https://www.wowhead.com/classic/spell=17315/puncture-armor) is at max stacks, has 2 seconds left, and is refreshed, then no combat log event is posted, and therefore no proc can be detected.
+
+## SuperWow Improvements
+
+If you use [SuperWoW](https://github.com/balakethelock/SuperWoW) then almost all procs have 100% accuracy.
+
+SuperWoW introduces a new event `UNIT_CASTEVENT` that fires every time a spell or ability is used which includes procs. The event contains:
+ - The caster GUID
+ - The target GUID
+ - The spellID
+
+Some of the edge cases above that are handled
+ - The spellID ensures that no spell name duplication triggers false positives. For instance: [[Coldrage Dagger]](https://www.wowhead.com/classic/item=10761/coldrage-dagger)'s [[Frostbolt]](https://www.wowhead.com/classic/spell=13439/frostbolt) has a different spellID from a mages [[Frostbolt]](https://www.wowhead.com/classic/spell=25304/frostbolt)
+ - Buff refreshes are now tracked because `UNIT_CASTEVENT` is always fired, even when an existing buffs is still active
+ - Debuff refhreses are now tracked because `UNIT_CASTEVENT` is always fired, even when an existing debuff is still active.
+
+### SuperWoW exceptions
+
+Even though SupwerWoW has some information about Main hand and Off-hand attacks, this information is not enough to determine which hand procced an effect. Therefore, all testing should still be done with only 1 weapon equipped in the main hand.
+
+3 buffs have been found that triggers without any `UNIT_CASTEVENT` firing, which excepts them from the SuperWoW improvements. These are:
+ - [[Nightfall]](https://www.wowhead.com/classic/item=19169/nightfall) proccing [Spell Vulnerability](https://www.wowhead.com/classic/spell=23605/spell-vulnerability)
+ - [[Annihilator]](https://www.wowhead.com/classic/item=12798/annihilator) proccing [[Armor Shatter]](https://www.wowhead.com/classic/spell=16928/armor-shatter)
+ - [[Dark Iron Sunderer]](https://www.wowhead.com/classic/item=11607/dark-iron-sunderer) proccing [[Cleave Armor]](https://www.wowhead.com/classic/spell=15280/cleave-armor)
+
+Ironicly these 3 debuffs have the highest viability in raids and are therefore most tested while being in the most unreliable group. These would have benefited the most from being made secure by SupwerWoW.
 
 # ProcScience from Classic WoW Armaments
 

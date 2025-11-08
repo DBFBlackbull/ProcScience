@@ -1,3 +1,5 @@
+local L = ProcScience_L
+
 L.WARRIOR = {
 	Damage = {
 		["Heroic Strike"] =  78,
