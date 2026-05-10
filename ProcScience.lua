@@ -163,7 +163,7 @@ function ProcScience:CheckProcEvent(timestamp, event, unit, spellName)
 	end
 
 	local events = proc.info.events
-	if self.superWowActive and proc.superWowEvents then
+	if self.superWowActive and proc.info.superWowEvents then
 		events = proc.info.superWowEvents
 	end
 
@@ -536,8 +536,6 @@ function ProcScience:RegisterEvents()
 	if self.superWowActive then
 		self:RegisterEvent("UNIT_CASTEVENT")
 		--self:RegisterEvent("RAW_COMBATLOG")
-	--	self:UnregisterEvent("CHAT_MSG_SPELL_SELF_DAMAGE") -- handled by UNIT_CASTEVENT
-	--	self:UnregisterEvent("CHAT_MSG_SPELL_SELF_BUFF") -- handled by UNIT_CASTEVENT
 	end
 
 	-- 1.14 events
