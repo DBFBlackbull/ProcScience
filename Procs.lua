@@ -127,6 +127,27 @@ L.Procs = {
 	--endregion
 
 	--region ==== Axes ====
+	[19852] = { itemName = "Ancient Hakkari Manslayer", attackSpeed = 2.0, spellID = 24585, spellName = "Drain Life",       school = L.SCHOOL.Shadow,   events = L.Events.Damage,             superWowEvents = L.Events.SuperWowEnemy }, -- Needs testing
+	[12798] = { itemName = "Annihilator",               attackSpeed = 1.7, spellID = 16928, spellName = "Armor Shatter",    school = L.SCHOOL.Shadow,   events = L.Events.TargetStackingAura }, -- Does not trigger UNIT_CASTEVENT
+	[811]   = { itemName = "Axe of the Deep Woods",     attackSpeed = 2.7, spellID = 18104, spellName = "Wrath",            school = L.SCHOOL.Nature,   events = L.Events.Damage,             superWowEvents = L.Events.SuperWowEnemy },
+	[6738]  = { itemName = "Bleeding Crescent",         attackSpeed = 2.4, spellID = 16403, spellName = "Rend",             school = L.SCHOOL.Physical, events = L.Events.TargetAura,         superWowEvents = L.Events.SuperWowEnemy }, -- Needs testing
+	[17068] = { itemName = "Deathbringer",              attackSpeed = 2.9, spellID = 18138, spellName = "Shadow Bolt",      school = L.SCHOOL.Shadow,   events = L.Events.Damage,             superWowEvents = L.Events.SuperWowEnemy },
+	[12621] = { itemName = "Demonfork",                 attackSpeed = 2.8, spellID = 16603, spellName = "Demonfork",        school = L.SCHOOL.Shadow,   events = L.Events.TargetAura,         superWowEvents = L.Events.SuperWowEnemy }, -- Needs testing
+	[9465]  = { itemName = "Digmaster 5000",            attackSpeed = 1.8, spellID = 11791, spellName = "Puncture Armor",   school = L.SCHOOL.Physical, events = L.Events.TargetAura,         superWowEvents = L.Events.SuperWowEnemy, isPhantomStrike = true }, -- Needs testing
+	[17704] = { itemName = "Edge of Winter",            attackSpeed = 2.1, spellID = 16407, spellName = "Frost Blast",      school = L.SCHOOL.Frost,    events = L.Events.Damage,             superWowEvents = L.Events.SuperWowEnemy }, -- Needs testing
+	[871]   = { itemName = "Flurry Axe",                attackSpeed = 1.5, spellID = 18797, spellName = "Flurry Axe",       school = L.SCHOOL.Physical, events = L.Events.ExtraAttacks,       superWowEvents = L.Events.SuperWowEnemy },
+	[10772] = { itemName = "Glutton's Cleaver",         attackSpeed = 2.0, spellID = 18075, spellName = "Rend",             school = L.SCHOOL.Physical, events = L.Events.TargetAura,         superWowEvents = L.Events.SuperWowEnemy, isPhantomStrike = true }, -- Needs testing
+	[1481]  = { itemName = "Grimclaw",                  attackSpeed = 2.0, spellID = 13440, spellName = "Shadow Bolt",      school = L.SCHOOL.Shadow,   events = L.Events.Damage,             superWowEvents = L.Events.SuperWowEnemy }, -- Needs testing
+	[17002] = { itemName = "Ichor Spitter",             attackSpeed = 2.4, spellID = 17511, spellName = "Poison",           school = L.SCHOOL.Nature,   events = L.Events.TargetAura,         superWowEvents = L.Events.SuperWowEnemy }, -- Needs testing
+	[9478]  = { itemName = "Ripsaw",                    attackSpeed = 2.7, spellID = 16405, spellName = "Wound",            school = L.SCHOOL.Physical, events = L.Events.Damage,             superWowEvents = L.Events.SuperWowEnemy, isPhantomStrike = true }, -- needs testing
+	[13286] = { itemName = "Rivenspike",                attackSpeed = 2.9, spellID = 17315, spellName = "Puncture Armor",   school = L.SCHOOL.Physical, events = L.Events.TargetStackingAura, superWowEvents = L.Events.SuperWowEnemy, isPhantomStrike = true },
+	[5426]  = { itemName = "Serpent's Kiss",            attackSpeed = 2.5, spellID = 18197, spellName = "Poison",           school = L.SCHOOL.Nature,   events = L.Events.TargetAura,         superWowEvents = L.Events.SuperWowEnemy }, -- Needs testing
+	[9608]  = { itemName = "Shoni's Disarming Tool",    attackSpeed = 1.9, spellID = 11879, spellName = "Disarm",           school = L.SCHOOL.Physical, events = L.Events.TargetAura,         superWowEvents = L.Events.SuperWowEnemy }, -- Needs testing
+	[13408] = { itemName = "Soul Breaker",              attackSpeed = 1.6, spellID = 17506, spellName = "Soul Breaker",     school = L.SCHOOL.Shadow,   events = L.Events.TargetAura,         superWowEvents = L.Events.SuperWowEnemy }, -- Needs testing
+	[934]   = { itemName = "Stalvan's Reaper",          attackSpeed = 2.9, spellID = 13524, spellName = "Curse of Stalvan", school = L.SCHOOL.Shadow,   events = L.Events.TargetAura,         superWowEvents = L.Events.SuperWowEnemy }, -- Needs testing
+	[9485]  = { itemName = "Vibroblade",                attackSpeed = 1.6, spellID = 11791, spellName = "Puncture Armor",   school = L.SCHOOL.Physical, events = L.Events.TargetAura,         superWowEvents = L.Events.SuperWowEnemy, isPhantomStrike = true }, -- Needs testing
+	[15853] = { itemName = "Windreaper",                attackSpeed = 2.3, spellID = 20586, spellName = "Windreaper",       school = L.SCHOOL.Nature,   events = L.Events.TargetAura,         superWowEvents = L.Events.SuperWowEnemy }, -- Needs testing
+	[11920] = { itemName = "Wraith Scythe",             attackSpeed = 2.2, spellID = 16414, spellName = "Drain Life",       school = L.SCHOOL.Shadow,   events = L.Events.Damage,             superWowEvents = L.Events.SuperWowEnemy }, -- Needs testing
 	--endregion
 
 	-- Maces
@@ -145,7 +166,7 @@ L.Procs = {
 
 	-- Self-applied events
 	[647]   = { itemName = "Destiny", attackSpeed = 2.6, spellID = 17152, spellName = "Destiny", events = L.Events.SelfAura, superWowEvents = L.Events.SuperWowEnemy },
-	[871]   = { itemName = "Flurry Axe", attackSpeed = 1.5, spellID = 18797, spellName = "Flurry Axe", events = L.Events.ExtraAttacks, superWowEvents = L.Events.SuperWowEnemy },
+
 	[7717]  = { itemName = "Ravager", attackSpeed = 3.5, spellID = 9632, spellName = "Bladestorm", events = L.Events.SelfAura, superWowEvents = L.Events.SuperWowEnemy, isPhantomStrike = true },
 	[7960]  = { itemName = "Truesilver Champion", attackSpeed = 3.0, spellID = 9800, spellName = "Holy Shield", events = L.Events.SelfAura, superWowEvents = L.Events.SuperWowEnemy },
 	[11684] = { itemName = "Ironfoe", attackSpeed = 2.4, spellID = 15494, spellName = "Fury of Forgewright", events = L.Events.ExtraAttacks, superWowEvents = L.Events.SuperWowEnemy },
@@ -156,23 +177,17 @@ L.Procs = {
 	[18348] = { itemName = "Quel'Serrar", attackSpeed = 2.0, spellID = 22850, spellName = "Sanctuary", events = L.Events.SelfAura, superWowEvents = L.Events.SuperWowEnemy },
 
 	-- Target-applied events
-	[811]    = { itemName = "Axe of the Deep Woods", attackSpeed = 2.7, spellID = 18104, spellName = "Wrath", school = L.SCHOOL.Nature, events = L.Events.Damage, superWowEvents = L.Events.SuperWowEnemy },
-	[5756]   = { itemName = "Sliverblade", attackSpeed = 1.4, spellID = 18398, spellName = "Frost Blast", school = L.SCHOOL.Frost, events = L.Events.Damage, superWowEvents = L.Events.SuperWowEnemy },
 	[7959]   = { itemName = "Blight", attackSpeed = 2.7, spellID = 9796, spellName = "Blight", school = L.SCHOOL.Nature, events = L.Events.Damage, superWowEvents = L.Events.SuperWowEnemy },
 	[11607]  = { itemName = "Dark Iron Sunderer", attackSpeed = 2.6, spellID = 15280, spellName = "Cleave Armor", school = L.SCHOOL.Physical, events = L.Events.TargetAura }, -- Does not trigger UNIT_CASTEVENT
 	[12592]  = { itemName = "Blackblade of Shahram", attackSpeed = 3.5, spellID = 16602, spellName = "Shahram", school = "Arcane", events = L.Events.Summon, superWowEvents = L.Events.SuperWowEnemy },
-	[12798]  = { itemName = "Annihilator", attackSpeed = 1.7, spellID = 16928, spellName = "Armor Shatter", school = L.SCHOOL.Shadow, events = L.Events.TargetStackingAura }, -- Does not trigger UNIT_CASTEVENT
 	[13204]  = { itemName = "Bashguuder", attackSpeed = 1.8, spellID = 17315, spellName = "Puncture Armor", school = L.SCHOOL.Physical, events = L.Events.TargetStackingAura, superWowEvents = L.Events.SuperWowEnemy, isPhantomStrike = true },
 	[13285]  = { itemName = "The Blackrock Slicer", attackSpeed = 4.0, spellID = 17407, spellName = "Wound", school = L.SCHOOL.Physical, events = L.Events.Damage, superWowEvents = L.Events.SuperWowEnemy, isPhantomStrike = true },
-	[13286]  = { itemName = "Rivenspike", attackSpeed = 2.9, spellID = 17315, spellName = "Puncture Armor", school = L.SCHOOL.Physical, events = L.Events.TargetStackingAura, superWowEvents = L.Events.SuperWowEnemy, isPhantomStrike = true },
 	[13348]  = { itemName = "Demonshear", attackSpeed = 3.8, spellID = 17483, spellName = "Shadow Bolt", school = L.SCHOOL.Shadow, events = L.Events.Damage, superWowEvents = L.Events.SuperWowEnemy },
 	[13393]  = { itemName = "Malown's Slam", attackSpeed = 3.8, spellID = 17500, spellName = "Malown's Slam", events = L.Events.TargetAura, superWowEvents = L.Events.SuperWowEnemy }, -- This weapon has both a 2 sec enemy debuff and a 30 sec self buff.
-	[14024]  = { itemName = "Frightalon", attackSpeed = 1.4, spellID = 19755, spellName = "Frightalon", school = L.SCHOOL.Shadow, events = L.Events.TargetAura, superWowEvents = L.Events.SuperWowEnemy },
 	[14487]  = { itemName = "Bonechill Hammer", attackSpeed = 2.4, spellID = 18276, spellName = "Frost Blast", school = L.SCHOOL.Frost, events = L.Events.Damage, superWowEvents = L.Events.SuperWowEnemy },
 	[15853]  = { itemName = "Windreaper", attackSpeed = 2.3, spellID = 20586, spellName = "Windreaper", school = L.SCHOOL.Nature, events = L.Events.TargetAura, superWowEvents = L.Events.SuperWowEnemy },
 	[17073]  = { itemName = "Earthshaker", attackSpeed = 3.5, spellID = 21152, spellName = "Earthshaker", school = L.SCHOOL.Physical, events = L.Events.TargetAura, superWowEvents = L.Events.SuperWowEnemy },
 	[17075]  = { itemName = "Vis'kag the Bloodletter", attackSpeed = 2.6, spellID = 21140, spellName = "Fatal Wound", L.SCHOOL.Physical, events = L.Events.Damage, superWowEvents = L.Events.SuperWowEnemy },
-	[17068]  = { itemName = "Deathbringer", attackSpeed = 2.9, spellID = 18138, spellName = "Shadow Bolt", school = L.SCHOOL.Shadow, events = L.Events.Damage, superWowEvents = L.Events.SuperWowEnemy },
 	[17182]  = { itemName = "Sulfuras, Hand of Ragnaros", attackSpeed = 3.7, spellID = 21162, spellName = "Fireball", school = L.SCHOOL.Fire, events = L.Events.Damage, superWowEvents = L.Events.SuperWowEnemy },
 	[19169]  = { itemName = "Nightfall", attackSpeed = 3.5, spellID = 23605, spellName = "Spell Vulnerability", school = L.SCHOOL.Physical, events = L.Events.TargetAura }, -- Does not trigger UNIT_CASTEVENT
 	[19353]  = { itemName = "Drake Talon Cleaver", attackSpeed = 3.4, spellID = 21140, spellName = "Fatal Wound", school = L.SCHOOL.Physical, events = L.Events.Damage, superWowEvents = L.Events.SuperWowEnemy },
