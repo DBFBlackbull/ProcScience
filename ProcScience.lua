@@ -157,6 +157,10 @@ function ProcScience:UpdateProcHits(source, isOffHand, amount)
 end
 
 function ProcScience:CheckProcEvent(timestamp, event, unit, spellName)
+	--self:Print(string.format("%s %s %s", event, spellName, unit))
+	--self:Print(string.format("%s %s", self.player.name, self.player.guid))
+	--self:Print(string.format("%s %s", self.player.target, self.player.targetGuid))
+
 	local proc = self.tracked[spellName]
 	if proc == nil then
 		return
