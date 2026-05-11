@@ -114,9 +114,20 @@ L.Procs = {
 	-- [12791] = { itemName = "Blade of Eternal Darkness", attackSpeed = 2.0, spellID = 13318, spellName = "Rend", school = L.SCHOOL.Physical, events = L.Events.TargetAura, superWowEvents = L.Events.SuperWowEnemy }, -- No way of tracking spell casts yet
 	--endregion
 
-	-- Fist weapons
+	--region ==== Fist weapons ====
+	[19910] = { itemName = "Arlokk's Grasp",           attackSpeed = 1.5, spellID = 18205, spellName = "Shadow Bolt",      school = L.SCHOOL.Shadow,   events = L.Events.Damage,     superWowEvents = L.Events.SuperWowEnemy }, -- Needs testing
+	[11744] = { itemName = "Bloodfist",                attackSpeed = 1.8, spellID = 16433, spellName = "Wound",            school = L.SCHOOL.Physical, events = L.Events.Damage,     superWowEvents = L.Events.SuperWowEnemy, isPhantomStrike = true }, -- Needs testing
+	[17738] = { itemName = "Claw of Celebras",         attackSpeed = 1.8, spellID = 21952, spellName = "Poison",           school = L.SCHOOL.Nature,   events = L.Events.TargetAura, superWowEvents = L.Events.SuperWowEnemy }, -- Needs testing
+	[18202] = { itemName = "Eskhandar's Left Claw",    attackSpeed = 1.5, spellID = 22639, spellName = "Eskhandar's Rage", school = L.SCHOOL.Physical, events = L.Events.TargetAura, superWowEvents = L.Events.SuperWowEnemy }, -- Needs testing
+	[18203] = { itemName = "Eskhandar's Right Claw",   attackSpeed = 1.5, spellID = 22640, spellName = "Eskhandar's Rage", school = L.SCHOOL.Physical, events = L.Events.SelfAura,   superWowEvents = L.Events.SuperWowEnemy }, -- Needs testing
+	[13399] = { itemName = "Gargoyle Shredder Talons", attackSpeed = 1.8, spellID = 18202, spellName = "Rend",             school = L.SCHOOL.Physical, events = L.Events.TargetAura, superWowEvents = L.Events.SuperWowEnemy, isPhantomStrike = true }, -- Needs testing
+	[13198] = { itemName = "Hurd Smasher",             attackSpeed = 1.8, spellID = 17308, spellName = "Stun",             school = L.SCHOOL.Physical, events = L.Events.TargetAura, superWowEvents = L.Events.SuperWowEnemy }, -- Needs testing
+	[2942]  = { itemName = "Iron Knuckles",            attackSpeed = 1.7, spellID = 13491, spellName = "Pummel",           school = L.SCHOOL.Physical, events = L.Events.Damage,     superWowEvents = L.Events.SuperWowEnemy, isPhantomStrike = true }, -- Needs testing
+	[11603] = { itemName = "Vilerend Slicer",          attackSpeed = 1.4, spellID = 16405, spellName = "Wound",            school = L.SCHOOL.Physical, events = L.Events.Damage,     superWowEvents = L.Events.SuperWowEnemy, isPhantomStrike = true }, -- Needs testing
+	--endregion
 
-	-- Axes
+	--region ==== Axes ====
+	--endregion
 
 	-- Maces
 
@@ -142,7 +153,6 @@ L.Procs = {
 	[17076] = { itemName = "Bonereaver's Edge", attackSpeed = 3.4, spellID = 21153, spellName = "Bonereaver's Edge", events = L.Events.SelfStackingAura, superWowEvents = L.Events.SuperWowEnemy },
 	[17112] = { itemName = "Empyrean Demolisher", attackSpeed = 2.8, spellID = 21165, spellName = "Haste", events = L.Events.SelfAura, superWowEvents = L.Events.SuperWowEnemy },
 	[17705] = { itemName = "Thrash Blade", attackSpeed = 2.7, spellID = 21919, spellName = "Thrash", events = L.Events.ExtraAttacks, superWowEvents = L.Events.SuperWowEnemy },
-	[18203] = { itemName = "Eskhandar's Right Claw", attackSpeed = 1.5, spellID = 22640, spellName = "Eskhandar's Rage", events = L.Events.SelfAura, superWowEvents = L.Events.SuperWowEnemy },
 	[18348] = { itemName = "Quel'Serrar", attackSpeed = 2.0, spellID = 22850, spellName = "Sanctuary", events = L.Events.SelfAura, superWowEvents = L.Events.SuperWowEnemy },
 
 	-- Target-applied events
