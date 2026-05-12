@@ -7,6 +7,7 @@ local L = ProcScience_L
 local INVSLOT_FIRST_EQUIPPED = 1
 local INVSLOT_LAST_EQUIPPED = 18
 
+local debugEvent = true
 ProcScienceStats = ProcScienceStats or { version = VERSION, items = {} }
 
 local function dump(o)
@@ -157,9 +158,14 @@ function ProcScience:UpdateProcHits(source, isOffHand, amount)
 end
 
 function ProcScience:CheckProcEvent(timestamp, event, unit, spellName)
-	--self:Print(string.format("%s %s %s", event, spellName, unit))
-	--self:Print(string.format("%s %s", self.player.name, self.player.guid))
-	--self:Print(string.format("%s %s", self.player.target, self.player.targetGuid))
+	if debugEvent and event ~= "UNIT_CASTEVENT" then
+		self:Print(string.format("%s %s %s", event, spellName, unit))
+		if unit == self.player.name then
+			self:Print(string.format("Unit is self: %s", self.player.name))
+		elseif unit == self.player.target then
+			self:Print(string.format("Unit is target: %s", self.player.target))
+		end
+	end
 
 	local proc = self.tracked[spellName]
 	if proc == nil then
@@ -295,10 +301,17 @@ function ProcScience:OnUnitCastEvent(timestamp)
 	local spellID = arg4
 	local castDuration = arg5
 
-	--if spellID ~= 6603 then
-	--	local spellName = SpellInfo(spellID)
-	--	self:Print(format("caster: %s target: %s eventType: %s spell: %s (%s) castDuration: %s", casterGuid, targetGuid, eventType, spellName, spellID, castDuration))
-	--end
+	-- filter out auto attack spells
+	if debugEvent and spellID ~= 6603 then
+		local spellName = SpellInfo(spellID)
+		self:Print(string.format("%s %s %s", event, spellName, targetGuid))
+		if targetGuid == self.player.guid then
+			self:Print(string.format("SuperWowUnit is self: %s", self.player.guid))
+		elseif targetGuid == self.player.targetGuid then
+			self:Print(string.format("SuperWowUnit is target: %s", self.player.targetGuid))
+		end
+		--self:Print(format("caster: %s target: %s eventType: %s spell: %s (%s) castDuration: %s", casterGuid, targetGuid, eventType, spellName, spellID, castDuration))
+	end
 
 	if casterGuid ~= self.player.guid then
 		return
