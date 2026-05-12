@@ -290,14 +290,60 @@ L.Procs = {
 	[9423]  = { itemName = "The Jackhammer",                attackSpeed = 2.5, spellID = 13533, spellName = "Haste",                  school = L.SCHOOL.Physical, events = L.Events.SelfAura,   superWowEvents = L.Events.SuperWowEnemy }, -- Needs testing
 	--endregion
 
-	-- Two-handed Swords
+	--region ==== Two-handed Swords ====
+	[12790] = { itemName = "Arcanite Champion",     attackSpeed = 3.0, spellID = 16916, spellName = "Strength of the Champion", school = L.SCHOOL.Holy,     events = L.Events.SelfAura,         superWowEvents = L.Events.SuperWowEnemy }, -- Needs testing
+	[2000]  = { itemName = "Archeus",               attackSpeed = 3.3, spellID = 18091, spellName = "Arcane Blast",             school = L.SCHOOL.Arcane,   events = L.Events.Damage,           superWowEvents = L.Events.SuperWowEnemy }, -- Needs testing
+	[14541] = { itemName = "Barovian Family Sword", attackSpeed = 2.1, spellID = 18652, spellName = "Siphon Health",            school = L.SCHOOL.Shadow,   events = L.Events.TargetAura,       superWowEvents = L.Events.SuperWowEnemy }, -- Needs testing
+	[12592] = { itemName = "Blackblade of Shahram", attackSpeed = 3.5, spellID = 16602, spellName = "Shahram",                  school = L.SCHOOL.Arcane,   events = L.Events.Summon,           superWowEvents = L.Events.SuperWowEnemy },
+	[17076] = { itemName = "Bonereaver's Edge",     attackSpeed = 3.4, spellID = 21153, spellName = "Bonereaver's Edge",        school = L.SCHOOL.Shadow,   events = L.Events.SelfStackingAura, superWowEvents = L.Events.SuperWowEnemy },
+	[22691] = { itemName = "Corrupted Ashbringer",  attackSpeed = 3.6, spellID = 29155, spellName = "Drain Life",               school = L.SCHOOL.Shadow,   events = L.Events.Damage,           superWowEvents = L.Events.SuperWowEnemy }, -- Needs testing
+	[10628] = { itemName = "Deathblow",             attackSpeed = 2.8, spellID = 16411, spellName = "Fatal Wound",              school = L.SCHOOL.Physical, events = L.Events.Damage,           superWowEvents = L.Events.SuperWowEnemy, isPhantomStrike = true }, -- Needs testing
+	[13348] = { itemName = "Demonshear",            attackSpeed = 3.8, spellID = 17483, spellName = "Shadow Bolt",              school = L.SCHOOL.Shadow,   events = L.Events.Damage,           superWowEvents = L.Events.SuperWowEnemy },
+	[647]   = { itemName = "Destiny",               attackSpeed = 2.6, spellID = 17152, spellName = "Destiny",                  school = L.SCHOOL.Physical, events = L.Events.SelfAura,         superWowEvents = L.Events.SuperWowEnemy },
+	[13053] = { itemName = "Doombringer",           attackSpeed = 2.8, spellID = 18211, spellName = "Shadow Bolt",              school = L.SCHOOL.Shadow,   events = L.Events.Damage,           superWowEvents = L.Events.SuperWowEnemy }, -- Needs testing
+	[12463] = { itemName = "Drakefang Butcher",     attackSpeed = 2.7, spellID = 14118, spellName = "Rend",                     school = L.SCHOOL.Physical, events = L.Events.TargetAura,       superWowEvents = L.Events.SuperWowEnemy, isPhantomStrike = true }, -- Needs testing
+	[2205]  = { itemName = "Duskbringer",           attackSpeed = 3.4, spellID = 18217, spellName = "Shadow Bolt",              school = L.SCHOOL.Shadow,   events = L.Events.Damage,           superWowEvents = L.Events.SuperWowEnemy }, -- Needs testing
+	[3854]  = { itemName = "Frost Tiger Blade",     attackSpeed = 3.4, spellID = 13439, spellName = "Frostbolt",                school = L.SCHOOL.Frost,    events = L.Events.Damage,           superWowEvents = L.Events.SuperWowEnemy }, -- Needs testing
+	[1387]  = { itemName = "Ghoulfang",             attackSpeed = 3.6, spellID = 16409, spellName = "Shadow Bolt",              school = L.SCHOOL.Shadow,   events = L.Events.Damage,           superWowEvents = L.Events.SuperWowEnemy }, -- Needs testing
+	[1986]  = { itemName = "Gutrender",             attackSpeed = 2.6, spellID = 18090, spellName = "Wound",                    school = L.SCHOOL.Physical, events = L.Events.Damage,           superWowEvents = L.Events.SuperWowEnemy, isPhantomStrike = true }, -- Needs testing
+	[21679] = { itemName = "Kalimdor's Revenge",    attackSpeed = 3.2, spellID = 26415, spellName = "Shock",                    school = L.SCHOOL.Nature,   events = L.Events.Damage,           superWowEvents = L.Events.SuperWowEnemy }, -- Needs testing
+	[1982]  = { itemName = "Nightblade",            attackSpeed = 2.8, spellID = 18211, spellName = "Shadow Bolt",              school = L.SCHOOL.Shadow,   events = L.Events.Damage,           superWowEvents = L.Events.SuperWowEnemy }, -- Needs testing
+	[3822]  = { itemName = "Runic Darkblade",       attackSpeed = 3.3, spellID = 16409, spellName = "Shadow Bolt",              school = L.SCHOOL.Shadow,   events = L.Events.Damage,           superWowEvents = L.Events.SuperWowEnemy }, -- Needs testing
+	[12992] = { itemName = "Searing Blade",         attackSpeed = 2.5, spellID = 16413, spellName = "Fireball",                 school = L.SCHOOL.Fire,     events = L.Events.Damage,           superWowEvents = L.Events.SuperWowEnemy }, -- Needs testing
+	[5182]  = { itemName = "Shiver Blade",          attackSpeed = 2.9, spellID = 18092, spellName = "Frost Blast",              school = L.SCHOOL.Frost,    events = L.Events.Damage,           superWowEvents = L.Events.SuperWowEnemy }, -- Needs testing
+	[18410] = { itemName = "Sprinter's Sword",      attackSpeed = 2.8, spellID = 22863, spellName = "Speed",                    school = L.SCHOOL.Physical, events = L.Events.SelfAura,         superWowEvents = L.Events.SuperWowEnemy }, -- Needs testing
+	[9418]  = { itemName = "Stoneslayer",           attackSpeed = 3.9, spellID = 12731, spellName = "Strength of Stone",        school = L.SCHOOL.Physical, events = L.Events.SelfAura,         superWowEvents = L.Events.SuperWowEnemy }, -- Needs testing
+	[6909]  = { itemName = "Strike of the Hydra",   attackSpeed = 3.3, spellID = 13526, spellName = "Corrosive Poison",         school = L.SCHOOL.Nature,   events = L.Events.TargetAura,       superWowEvents = L.Events.SuperWowEnemy }, -- Needs testing
+	[9372]  = { itemName = "Sul'thraze the Lasher", attackSpeed = 2.6, spellID = 11658, spellName = "Sul'thraze",               school = L.SCHOOL.Shadow,   events = L.Events.Damage,           superWowEvents = L.Events.SuperWowEnemy }, -- Needs testing
+	[19334] = { itemName = "The Untamed Blade",     attackSpeed = 3.4, spellID = 23719, spellName = "Untamed Fury",             school = L.SCHOOL.Physical, events = L.Events.SelfAura,         superWowEvents = L.Events.SuperWowEnemy }, -- Needs testing
+	[7960]  = { itemName = "Truesilver Champion",   attackSpeed = 3.0, spellID = 9800,  spellName = "Holy Shield",              school = L.SCHOOL.Holy,     events = L.Events.SelfAura,         superWowEvents = L.Events.SuperWowEnemy },
+	[13051] = { itemName = "Witchfury",             attackSpeed = 2.8, spellID = 18214, spellName = "Shadow Bolt",              school = L.SCHOOL.Shadow,   events = L.Events.Damage,           superWowEvents = L.Events.SuperWowEnemy }, -- Needs testing
+	--endregion
 
-	-- Self-applied events
-	[647]   = { itemName = "Destiny", attackSpeed = 2.6, spellID = 17152, spellName = "Destiny", events = L.Events.SelfAura, superWowEvents = L.Events.SuperWowEnemy },
-	[7960]  = { itemName = "Truesilver Champion", attackSpeed = 3.0, spellID = 9800, spellName = "Holy Shield", events = L.Events.SelfAura, superWowEvents = L.Events.SuperWowEnemy },
-	[11815] = { itemName = "Hand of Justice", spellID = 15601, spellName = "Hand of Justice", events = L.Events.ExtraAttacks, superWowEvents = L.Events.SuperWowSelf },
-	[17076] = { itemName = "Bonereaver's Edge", attackSpeed = 3.4, spellID = 21153, spellName = "Bonereaver's Edge", events = L.Events.SelfStackingAura, superWowEvents = L.Events.SuperWowEnemy },
-	[12592]  = { itemName = "Blackblade of Shahram", attackSpeed = 3.5, spellID = 16602, spellName = "Shahram", school = "Arcane", events = L.Events.Summon, superWowEvents = L.Events.SuperWowEnemy },
-	[13348]  = { itemName = "Demonshear", attackSpeed = 3.8, spellID = 17483, spellName = "Shadow Bolt", school = L.SCHOOL.Shadow, events = L.Events.Damage, superWowEvents = L.Events.SuperWowEnemy },
-	[15853]  = { itemName = "Windreaper", attackSpeed = 2.3, spellID = 20586, spellName = "Windreaper", school = L.SCHOOL.Nature, events = L.Events.TargetAura, superWowEvents = L.Events.SuperWowEnemy },
+	--region ==== Trinkets ====
+	[19287] = { itemName = "Darkmoon Card: Heroism",   spellID = 23689, spellName = "Heroism",          school = L.SCHOOL.Holy,     events = L.Events.SelfAura,     superWowEvents = L.Events.SuperWowSelf }, -- Needs testing
+	[19289] = { itemName = "Darkmoon Card: Maelstrom", spellID = 23686, spellName = "Lightning Strike", school = L.SCHOOL.Nature,   events = L.Events.Damage,       superWowEvents = L.Events.SuperWowEnemy }, -- Needs testing
+	[11815] = { itemName = "Hand of Justice",          spellID = 15601, spellName = "Hand of Justice",  school = L.SCHOOL.Physical, events = L.Events.ExtraAttacks, superWowEvents = L.Events.SuperWowSelf }, -- 2% chance, 2 sec cooldown
+	[22321] = { itemName = "Heart of Wyrmthalak",      spellID = 27656, spellName = "Flame Lash",       school = L.SCHOOL.Fire,     events = L.Events.Damage,       superWowEvents = L.Events.SuperWowEnemy }, -- Needs testing
+	--endregion
+}
+
+L.Enchants = {
+	[1900] = { enchantName = "Crusader",     spellID = 20007, spellName = "Holy Strength", school = L.SCHOOL.Holy, events = L.Events.SelfAura, superWowEvents = L.Events.SuperWowSelf }, -- Needs testing
+	[912]  = { enchantName = "Demonslaying", spellID = 0, spellName = "", school = "", events = L.Events.Damage, superWowEvents = L.Events.SuperWowEnemy }, -- Missing spellID and name for the proc
+	[803]  = { enchantName = "Fiery Weapon", spellID = 13897, spellName = "Fiery Weapon",  school = L.SCHOOL.Fire, events = L.Events.Damage,   superWowEvents = L.Events.SuperWowEnemy }, -- Missing spellID and name for the proc
+	[1894] = { enchantName = "Icy Weapon",   spellID = 0, spellName = "" }, -- Missing spellID and name for the proc
+	[1898] = { enchantName = "Lifestealing" }, -- Missing spellID and name for the proc
+	[1899] = { enchantName = "Unholy Weapon" }, -- Missing spellID and name for the proc
+}
+
+-- 1.12 cannot get the temp enchant ID via GetWeaponEnchantInfo()
+-- so name and tooltip scanning will be the way it is found
+L.TemporaryEnchants = {
+	["Frost Oil"]  = { enchantID = 26, spellID = 0, spellName = "", school = L.SCHOOL.Frost,  events = L.Events.Damage, superWowEvents = L.Events.SuperWowEnemy }, -- Missing spellID and name for the proc
+	["Shadow Oil"] = { enchantID = 25, spellID = 0, spellName = "", school = L.SCHOOL.Shadow, events = L.Events.Damage, superWowEvents = L.Events.SuperWowEnemy }, -- Missing spellID and name for the proc
+}
+
+L.Buffs = {
+	[15852] = { buffName = "Dragonbreath Chili", spellID = 15851, spellName = "Dragonbreath Chili", school = L.SCHOOL.Fire, events = L.Events.Damage, superWowEvents = L.Events.SuperWowEnemy }, -- Needs testing
 }
