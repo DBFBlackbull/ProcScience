@@ -7,6 +7,10 @@ local L = ProcScience_L
 local INVSLOT_FIRST_EQUIPPED = 1
 local INVSLOT_LAST_EQUIPPED = 18
 
+local INVSLOT_MAIN_HAND = 16
+local INVSLOT_OFF_HAND = 17
+local INVSLOT_RANGED = 18
+
 local debugEvent = true
 ProcScienceStats = ProcScienceStats or { version = VERSION, items = {} }
 
@@ -57,7 +61,27 @@ function ProcScience:PopulateSources()
 	end
 end
 
-function ProcScience:DetectItemProc(detected, itemID, slotID)
+local ProcScience_Prefix = "ProcScienceTooltip"
+local ProcScience_Tooltip = getglobal(ProcScience_Prefix) or CreateFrame("GameTooltip", ProcScience_Prefix, nil, "GameTooltipTemplate")
+ProcScience_Tooltip:SetOwner(WorldFrame, "ANCHOR_NONE")
+
+function ProcScience:GetAttackSpeed(slotID)
+	ProcScience_Tooltip:ClearLines()
+	ProcScience_Tooltip:SetInventoryItem("player", slotID)
+	for i = 1, ProcScience_Tooltip:NumLines() do
+		local line = getglobal(ProcScience_Prefix.."TextRight"..i)
+		local text = line:GetText()
+		if text then
+			local _, _, speed = string.find(text, "Speed (%d%.%d%d)")
+			if speed then
+				return tonumber(speed)
+			end
+		end
+	end
+end
+
+function ProcScience:DetectItemProc(detected, itemLink, slotID)
+	local itemID = self:GetItemIDFromLink(itemLink)
 	if not L.Procs[itemID] then
 		return
 	end
@@ -69,8 +93,10 @@ function ProcScience:DetectItemProc(detected, itemID, slotID)
 	end
 
 	local procStats = ProcScienceStats.items[itemID]
-	procStats.itemLink = GetInventoryItemLink("player", slotID)
-	procStats.attackSpeed = procInfo.attackSpeed
+	procStats.itemLink = itemLink
+	if slotID == INVSLOT_MAIN_HAND or slotID == INVSLOT_OFF_HAND or slotID == INVSLOT_RANGED then
+		procStats.attackSpeed = ProcScience:GetAttackSpeed(slotID)
+	end
 	procStats.spellName = procInfo.spellName
 	procStats.spellID = procInfo.spellID
 
@@ -105,18 +131,13 @@ function ProcScience:GetItemIDFromLink(itemLink)
 	return tonumber(itemID)
 end
 
-function ProcScience:GetInventoryItemID(unit, slotID)
-	local itemLink = GetInventoryItemLink(unit, slotID)
-	return self:GetItemIDFromLink(itemLink)
-end
-
 function ProcScience:DetectItems()
 	local detected = {}
 
 	for slotID = INVSLOT_FIRST_EQUIPPED, INVSLOT_LAST_EQUIPPED do
-		local itemID = self:GetInventoryItemID("player", slotID)
-		if itemID then
-			self:DetectItemProc(detected, itemID, slotID)
+		local itemLink = GetInventoryItemLink("player", slotID)
+		if itemLink then
+			self:DetectItemProc(detected, itemLink, slotID)
 		end
 	end
 
@@ -159,13 +180,13 @@ end
 
 function ProcScience:CheckProcEvent(timestamp, event, unit, spellName)
 	if debugEvent and event ~= "UNIT_CASTEVENT" then
-		local target
+		local target = ""
 		if unit == self.player.name then
 			target = "self"
 		elseif unit == self.player.target then
 			target = "target"
 		end
-		self:Print(string.format("%s %s %s unit == %s", event, spellName, tostring(unit), target))
+		self:Print(string.format("%s %s %s unit == %s", event, spellName, unit, target))
 	end
 
 	local proc = self.tracked[spellName]
@@ -305,7 +326,7 @@ function ProcScience:OnUnitCastEvent(timestamp)
 	-- filter out auto attack spells
 	if debugEvent and spellID ~= 6603 then
 		local spellName = SpellInfo(spellID)
-		local target
+		local target = ""
 		if targetGuid == self.player.guid then
 			target = "self"
 		elseif targetGuid == self.player.targetGuid then
