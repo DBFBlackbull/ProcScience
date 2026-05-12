@@ -14,6 +14,11 @@ L.Events = {
 		trigger = L.TRIGGER_ON_CAST,
 		CHAT_MSG_SPELL_SELF_BUFF = true,
 	},
+	SelfHeal = {
+		target = L.TARGET_SELF,
+		trigger = L.TRIGGER_ON_CAST,
+		CHAT_MSG_SPELL_SELF_BUFF = true,
+	},
 	SelfAura = {
 		target = L.TARGET_SELF,
 		trigger = L.TRIGGER_ON_HIT,
@@ -291,7 +296,7 @@ L.Procs = {
 	--endregion
 
 	--region ==== Two-handed Swords ====
-	[12790] = { itemName = "Arcanite Champion",     attackSpeed = 3.0, spellID = 16916, spellName = "Strength of the Champion", school = L.SCHOOL.Holy,     events = L.Events.SelfAura,         superWowEvents = L.Events.SuperWowEnemy }, -- Needs testing
+	[12790] = { itemName = "Arcanite Champion",     attackSpeed = 3.0, spellID = 16916, spellName = "Strength of the Champion", school = L.SCHOOL.Holy,     events = L.Events.SelfHeal,         superWowEvents = L.Events.SuperWowEnemy }, -- Needs testing
 	[2000]  = { itemName = "Archeus",               attackSpeed = 3.3, spellID = 18091, spellName = "Arcane Blast",             school = L.SCHOOL.Arcane,   events = L.Events.Damage,           superWowEvents = L.Events.SuperWowEnemy }, -- Needs testing
 	[14541] = { itemName = "Barovian Family Sword", attackSpeed = 2.1, spellID = 18652, spellName = "Siphon Health",            school = L.SCHOOL.Shadow,   events = L.Events.TargetAura,       superWowEvents = L.Events.SuperWowEnemy }, -- Needs testing
 	[12592] = { itemName = "Blackblade of Shahram", attackSpeed = 3.5, spellID = 16602, spellName = "Shahram",                  school = L.SCHOOL.Arcane,   events = L.Events.Summon,           superWowEvents = L.Events.SuperWowEnemy },
@@ -321,29 +326,29 @@ L.Procs = {
 	--endregion
 
 	--region ==== Trinkets ====
-	[19287] = { itemName = "Darkmoon Card: Heroism",   spellID = 23689, spellName = "Heroism",          school = L.SCHOOL.Holy,     events = L.Events.SelfAura,     superWowEvents = L.Events.SuperWowSelf }, -- Needs testing
-	[19289] = { itemName = "Darkmoon Card: Maelstrom", spellID = 23686, spellName = "Lightning Strike", school = L.SCHOOL.Nature,   events = L.Events.Damage,       superWowEvents = L.Events.SuperWowEnemy }, -- Needs testing
+	[19287] = { itemName = "Darkmoon Card: Heroism",   spellID = 23689, spellName = "Heroism",          school = L.SCHOOL.Holy,     events = L.Events.SelfHeal,     superWowEvents = L.Events.SuperWowSelf },
+	[19289] = { itemName = "Darkmoon Card: Maelstrom", spellID = 23686, spellName = "Lightning Strike", school = L.SCHOOL.Nature,   events = L.Events.Damage,       superWowEvents = L.Events.SuperWowEnemy },
 	[11815] = { itemName = "Hand of Justice",          spellID = 15601, spellName = "Hand of Justice",  school = L.SCHOOL.Physical, events = L.Events.ExtraAttacks, superWowEvents = L.Events.SuperWowSelf }, -- 2% chance, 2 sec cooldown
-	[22321] = { itemName = "Heart of Wyrmthalak",      spellID = 27656, spellName = "Flame Lash",       school = L.SCHOOL.Fire,     events = L.Events.Damage,       superWowEvents = L.Events.SuperWowEnemy }, -- Needs testing
+	[22321] = { itemName = "Heart of Wyrmthalak",      spellID = 27656, spellName = "Flame Lash",       school = L.SCHOOL.Fire,     events = L.Events.Damage,       superWowEvents = L.Events.SuperWowEnemy },
 	--endregion
 }
 
 L.Enchants = {
-	[1900] = { enchantName = "Crusader",     spellID = 20007, spellName = "Holy Strength", school = L.SCHOOL.Holy, events = L.Events.SelfAura, superWowEvents = L.Events.SuperWowSelf }, -- Needs testing
-	[912]  = { enchantName = "Demonslaying", spellID = 0, spellName = "", school = "", events = L.Events.Damage, superWowEvents = L.Events.SuperWowEnemy }, -- Missing spellID and name for the proc
-	[803]  = { enchantName = "Fiery Weapon", spellID = 13897, spellName = "Fiery Weapon",  school = L.SCHOOL.Fire, events = L.Events.Damage,   superWowEvents = L.Events.SuperWowEnemy }, -- Missing spellID and name for the proc
-	[1894] = { enchantName = "Icy Weapon",   spellID = 0, spellName = "" }, -- Missing spellID and name for the proc
-	[1898] = { enchantName = "Lifestealing" }, -- Missing spellID and name for the proc
-	[1899] = { enchantName = "Unholy Weapon" }, -- Missing spellID and name for the proc
+	[1900] = { enchantName = "Crusader",      spellID = 20007, spellName = "Holy Strength", school = L.SCHOOL.Holy,   events = L.Events.SelfHeal,   superWowEvents = L.Events.SuperWowSelf },
+	[912]  = { enchantName = "Demonslaying",  spellID = 13907, spellName = "Smite Demon",   school = L.SCHOOL.Holy,   events = L.Events.Damage,     superWowEvents = L.Events.SuperWowEnemy },
+	[803]  = { enchantName = "Fiery Weapon",  spellID = 13897, spellName = "Fiery Weapon",  school = L.SCHOOL.Fire,   events = L.Events.Damage,     superWowEvents = L.Events.SuperWowEnemy },
+	[1894] = { enchantName = "Icy Weapon",    spellID = 20005, spellName = "Chilled",       school = L.SCHOOL.Frost,  events = L.Events.TargetAura, superWowEvents = L.Events.SuperWowEnemy},
+	[1898] = { enchantName = "Lifestealing",  spellID = 20004, spellName = "Life Steal",    school = L.SCHOOL.Shadow, events = L.Events.Damage,     superWowEvents = L.Events.SuperWowEnemy },
+	[1899] = { enchantName = "Unholy Weapon", spellID = 20006, spellName = "Unholy Curse",  school = L.SCHOOL.Shadow, events = L.Events.TargetAura, superWowEvents = L.Events.SuperWowEnemy },
 }
 
 -- 1.12 cannot get the temp enchant ID via GetWeaponEnchantInfo()
 -- so name and tooltip scanning will be the way it is found
 L.TemporaryEnchants = {
-	["Frost Oil"]  = { enchantID = 26, spellID = 0, spellName = "", school = L.SCHOOL.Frost,  events = L.Events.Damage, superWowEvents = L.Events.SuperWowEnemy }, -- Missing spellID and name for the proc
-	["Shadow Oil"] = { enchantID = 25, spellID = 0, spellName = "", school = L.SCHOOL.Shadow, events = L.Events.Damage, superWowEvents = L.Events.SuperWowEnemy }, -- Missing spellID and name for the proc
+	["Frost Oil"]  = { itemID = 3829, enchantID = 26, spellID = 205, spellName = "Frostbolt",   school = L.SCHOOL.Frost,  events = L.Events.Damage, superWowEvents = L.Events.SuperWowEnemy },
+	["Shadow Oil"] = { itemID = 3824, enchantID = 25, spellID = 705, spellName = "Shadow Bolt", school = L.SCHOOL.Shadow, events = L.Events.Damage, superWowEvents = L.Events.SuperWowEnemy },
 }
 
 L.Buffs = {
-	[15852] = { buffName = "Dragonbreath Chili", spellID = 15851, spellName = "Dragonbreath Chili", school = L.SCHOOL.Fire, events = L.Events.Damage, superWowEvents = L.Events.SuperWowEnemy }, -- Needs testing
+	[15852] = { itemID = 12217, buffName = "Dragonbreath Chili", spellID = 15851, spellName = "Dragonbreath Chili", school = L.SCHOOL.Fire, events = L.Events.Damage, superWowEvents = L.Events.SuperWowEnemy },
 }

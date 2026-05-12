@@ -159,12 +159,13 @@ end
 
 function ProcScience:CheckProcEvent(timestamp, event, unit, spellName)
 	if debugEvent and event ~= "UNIT_CASTEVENT" then
-		self:Print(string.format("%s %s %s", event, spellName, unit))
+		local target
 		if unit == self.player.name then
-			self:Print(string.format("Unit is self: %s", self.player.name))
+			target = "self"
 		elseif unit == self.player.target then
-			self:Print(string.format("Unit is target: %s", self.player.target))
+			target = "target"
 		end
+		self:Print(string.format("%s %s %s unit == %s", event, spellName, tostring(unit), target))
 	end
 
 	local proc = self.tracked[spellName]
@@ -304,12 +305,13 @@ function ProcScience:OnUnitCastEvent(timestamp)
 	-- filter out auto attack spells
 	if debugEvent and spellID ~= 6603 then
 		local spellName = SpellInfo(spellID)
-		self:Print(string.format("%s %s %s", event, spellName, targetGuid))
+		local target
 		if targetGuid == self.player.guid then
-			self:Print(string.format("SuperWowUnit is self: %s", self.player.guid))
+			target = "self"
 		elseif targetGuid == self.player.targetGuid then
-			self:Print(string.format("SuperWowUnit is target: %s", self.player.targetGuid))
+			target = "target"
 		end
+		self:Print(string.format("%s %s %s %s unit == %s", event, spellID, spellName, targetGuid, target))
 		--self:Print(format("caster: %s target: %s eventType: %s spell: %s (%s) castDuration: %s", casterGuid, targetGuid, eventType, spellName, spellID, castDuration))
 	end
 
@@ -380,14 +382,16 @@ function ProcScience:OnCombatLogEvent(timestamp)
 
 	-- Track extra attacks from Hand of Justice or Ironfoe
 	if event == "CHAT_MSG_SPELL_SELF_BUFF" then
-		local _, _, unit, spellName = string.find(arg1, "(You) gain %d extra attacks? through (.+)%.")
+		local _, _, spellExtraAttack = string.find(arg1, "You gain %d extra attacks? through (.+)%.")
+		local _, _, spellHeal = string.find(arg1, "Your (.+) heals you for %d+")
+		local spellName = spellExtraAttack or spellHeal
 		return self:CheckProcEvent(timestamp, event, self.player.name, spellName)
 	end
 
 	if event == "CHAT_MSG_SPELL_PERIODIC_SELF_BUFFS" then
-		local _, _, unit, spellName, stacks = string.find(arg1, "(You) gain (.+) %((%d+)%)%.")
-		if not unit and not spellName then
-			_, _, unit, spellName = string.find(arg1, "(You) gain (.+)%.")
+		local _, _, spellName, stacks = string.find(arg1, "You gain (.+) %((%d+)%)%.")
+		if not spellName then
+			_, _, spellName = string.find(arg1, "You gain (.+)%.")
 		end
 		return self:CheckProcEvent(timestamp, event, self.player.name, spellName)
 	end
