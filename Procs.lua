@@ -220,7 +220,22 @@ L.Procs = {
 	[17075] = { itemName = "Vis'kag the Bloodletter",                      attackSpeed = 2.6, spellID = 21140, spellName = "Fatal Wound",          school = L.SCHOOL.Physical, events = L.Events.Damage,       superWowEvents = L.Events.SuperWowEnemy, isPhantomStrike = true },
 	[19901] = { itemName = "Zulian Slicer",                                attackSpeed = 2.5, spellID = 24251, spellName = "Zulian Slice",         school = L.SCHOOL.Nature,   events = L.Events.Damage,       superWowEvents = L.Events.SuperWowEnemy, isPhantomStrike = true }, -- Needs testing
 	--endregion
-	-- Polearms
+
+	--region ==== Polearms ====
+	[12583] = { itemName = "Blackhand Doomsaw",        attackSpeed = 3.5, spellID = 16549, spellName = "Wound",           school = L.SCHOOL.Physical, events = L.Events.Damage,     superWowEvents = L.Events.SuperWowEnemy, isPhantomStrike = true }, -- Needs testing
+	[7959]  = { itemName = "Blight",                   attackSpeed = 2.7, spellID = 9796,  spellName = "Blight",          school = L.SCHOOL.Nature,   events = L.Events.Damage,     superWowEvents = L.Events.SuperWowEnemy },
+	[13057] = { itemName = "Bloodpike",                attackSpeed = 3.2, spellID = 18202, spellName = "Rend",            school = L.SCHOOL.Physical, events = L.Events.TargetAura, superWowEvents = L.Events.SuperWowEnemy, isPhantomStrike = true }, -- Needs testing
+	[13148] = { itemName = "Chillpike",                attackSpeed = 2.8, spellID = 19260, spellName = "Frost Blast",     school = L.SCHOOL.Frost,    events = L.Events.Damage,     superWowEvents = L.Events.SuperWowEnemy }, -- Needs testing
+	[9475]  = { itemName = "Diabolic Skiver",          attackSpeed = 2.9, spellID = 18206, spellName = "Fatal Wound",     school = L.SCHOOL.Physical, events = L.Events.Damage,     superWowEvents = L.Events.SuperWowEnemy, isPhantomStrike = true }, -- Needs testing
+	[11809] = { itemName = "Flame Wrath",              attackSpeed = 3.3, spellID = 16559, spellName = "Flame Wrath",     school = L.SCHOOL.Fire,     events = L.Events.SelfAura,   superWowEvents = L.Events.SuperWowEnemy }, -- Needs testing
+	[13054] = { itemName = "Grim Reaper",              attackSpeed = 3.1, spellID = 14126, spellName = "Wound",           school = L.SCHOOL.Physical, events = L.Events.Damage,     superWowEvents = L.Events.SuperWowEnemy, isPhantomStrike = true }, -- Needs testing
+	[19874] = { itemName = "Halberd of Smiting",       attackSpeed = 3.5, spellID = 25669, spellName = "Decapitate",      school = L.SCHOOL.Physical, events = L.Events.Damage,     superWowEvents = L.Events.SuperWowEnemy, isPhantomStrike = true }, -- Needs testing
+	[1726]  = { itemName = "Poison-tipped Bone Spear", attackSpeed = 2.3, spellID = 16401, spellName = "Poison",          school = L.SCHOOL.Nature,   events = L.Events.TargetAura, superWowEvents = L.Events.SuperWowEnemy }, -- Needs testing
+	[17074] = { itemName = "Shadowstrike",             attackSpeed = 3.1, spellID = 21170, spellName = "Drain Life",      school = L.SCHOOL.Shadow,   events = L.Events.Damage,     superWowEvents = L.Events.SuperWowEnemy }, -- Needs testing
+	[12243] = { itemName = "Smoldering Claw",          attackSpeed = 2.9, spellID = 15662, spellName = "Fireball",        school = L.SCHOOL.Fire,     events = L.Events.Damage,     superWowEvents = L.Events.SuperWowEnemy }, -- Needs testing
+	[13060] = { itemName = "The Needler",              attackSpeed = 2.2, spellID = 16405, spellName = "Wound",           school = L.SCHOOL.Physical, events = L.Events.Damage,     superWowEvents = L.Events.SuperWowEnemy, isPhantomStrike = true }, -- Needs testing
+	[17223] = { itemName = "Thunderstrike",            attackSpeed = 3.1, spellID = 21179, spellName = "Chain Lightning", school = L.SCHOOL.Nature,   events = L.Events.Damage,     superWowEvents = L.Events.SuperWowEnemy }, -- Needs testing
+	--endregion
 
 	-- Staves
 
@@ -241,7 +256,7 @@ L.Procs = {
 
 
 	-- Target-applied events
-	[7959]   = { itemName = "Blight", attackSpeed = 2.7, spellID = 9796, spellName = "Blight", school = L.SCHOOL.Nature, events = L.Events.Damage, superWowEvents = L.Events.SuperWowEnemy },
+
 	[11607]  = { itemName = "Dark Iron Sunderer", attackSpeed = 2.6, spellID = 15280, spellName = "Cleave Armor", school = L.SCHOOL.Physical, events = L.Events.TargetAura }, -- Does not trigger UNIT_CASTEVENT
 	[12592]  = { itemName = "Blackblade of Shahram", attackSpeed = 3.5, spellID = 16602, spellName = "Shahram", school = "Arcane", events = L.Events.Summon, superWowEvents = L.Events.SuperWowEnemy },
 
