@@ -11,6 +11,14 @@ local INVSLOT_MAIN_HAND = 16
 local INVSLOT_OFF_HAND = 17
 local INVSLOT_RANGED = 18
 
+local function IsWeaponSlot(slotID)
+	return slotID == INVSLOT_MAIN_HAND or slotID == INVSLOT_OFF_HAND or slotID == INVSLOT_RANGED
+end
+
+local function IsMeleeWeaponSlot(slotID)
+	return slotID == INVSLOT_MAIN_HAND or slotID == INVSLOT_OFF_HAND
+end
+
 local debugEvent = true
 ProcScienceStats = ProcScienceStats or { version = VERSION, items = {} }
 
@@ -94,7 +102,7 @@ function ProcScience:DetectItemProc(detected, itemLink, slotID)
 
 	local procStats = ProcScienceStats.items[itemID]
 	procStats.itemLink = itemLink
-	if slotID == INVSLOT_MAIN_HAND or slotID == INVSLOT_OFF_HAND or slotID == INVSLOT_RANGED then
+	if IsWeaponSlot(slotID) then
 		procStats.attackSpeed = ProcScience:GetAttackSpeed(slotID)
 	end
 	procStats.spellName = procInfo.spellName
@@ -103,15 +111,15 @@ function ProcScience:DetectItemProc(detected, itemLink, slotID)
 	if detected[procInfo.spellName] ~= nil then
 		local proc = detected[procInfo.spellName]
 		if proc.filter then
-			if (proc.filter == "main hand" and slotID == 17) or (proc.filter == "off-hand" and slotID == 16) then
+			if (proc.filter == "main hand" and slotID == INVSLOT_OFF_HAND) or (proc.filter == "off-hand" and slotID == INVSLOT_MAIN_HAND) then
 				proc.filter = nil
 			end
 		end
 	else
 		local proc = { itemID = itemID, info = procInfo, stats = procStats }
-		if slotID == 16 then
+		if slotID == INVSLOT_MAIN_HAND then
 			proc.filter = "main hand"
-		elseif slotID == 17 then
+		elseif slotID == INVSLOT_OFF_HAND then
 			proc.filter = "off-hand"
 		end
 		detected[procInfo.spellName] = proc
