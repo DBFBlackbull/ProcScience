@@ -178,7 +178,7 @@ function ProcScience:UpdateProcHits(source, isOffHand, amount)
 	end
 end
 
-function ProcScience:CheckProcEvent(timestamp, event, unit, spellName)
+function ProcScience:CheckProcEvent(timestamp, event, unit, spellName, spellID)
 	if debugEvent and event ~= "UNIT_CASTEVENT" then
 		local target = ""
 		if unit == self.player.name then
@@ -189,16 +189,12 @@ function ProcScience:CheckProcEvent(timestamp, event, unit, spellName)
 		self:Print(string.format("%s %s %s unit == %s", event, spellName, unit, target))
 	end
 
-	local proc = self.tracked[spellName]
-	if proc == nil then
+	local proc = self.tracked[spellID] or self.tracked[spellName]
+	if not proc then
 		return
 	end
 
-	local events = proc.info.events
-	if self.superWowActive and proc.info.superWowEvents then
-		events = proc.info.superWowEvents
-	end
-
+	local events = self.superWowActive and proc.info.superWowEvents or proc.info.events
 	if not events[event] then
 		return
 	end
@@ -322,10 +318,10 @@ function ProcScience:OnUnitCastEvent(timestamp)
 	local eventType = arg3
 	local spellID = arg4
 	local castDuration = arg5
+	local spellName = SpellInfo(spellID)
 
 	-- filter out auto attack spells
 	if debugEvent and spellID ~= 6603 then
-		local spellName = SpellInfo(spellID)
 		local target = ""
 		if targetGuid == self.player.guid then
 			target = "self"
@@ -344,12 +340,7 @@ function ProcScience:OnUnitCastEvent(timestamp)
 		return
 	end
 
-	local spellName = SpellInfo(spellID)
-	if not self.tracked[spellName] or not self.tracked[spellName].spellID == spellID then
-		return
-	end
-
-	return self:CheckProcEvent(timestamp, event, targetGuid, spellName)
+	return self:CheckProcEvent(timestamp, event, targetGuid, spellName, spellID)
 end
 
 function ProcScience:OnCombatLogEvent(timestamp)
