@@ -88,6 +88,37 @@ function ProcScience:GetAttackSpeed(slotID)
 	end
 end
 
+function ProcScience:DetectProc(detected, procInfo, procStats, link, slotID)
+	if IsWeaponSlot(slotID) then
+		procStats.attackSpeed = ProcScience:GetAttackSpeed(slotID)
+	end
+	procStats.itemLink = link
+	procStats.spellName = procInfo.spellName
+	procStats.spellID = procInfo.spellID
+
+	local detectedKey = procInfo.spellName
+	if self.superWowActive and procInfo.superWowEvents then
+		detectedKey = procInfo.spellID
+	end
+
+	if detected[detectedKey] ~= nil then
+		local proc = detected[detectedKey]
+		if proc.filter then
+			if (proc.filter == "main hand" and slotID == INVSLOT_OFF_HAND) or (proc.filter == "off-hand" and slotID == INVSLOT_MAIN_HAND) then
+				proc.filter = nil
+			end
+		end
+	else
+		local proc = { itemID = itemID, info = procInfo, stats = procStats }
+		if slotID == INVSLOT_MAIN_HAND then
+			proc.filter = "main hand"
+		elseif slotID == INVSLOT_OFF_HAND then
+			proc.filter = "off-hand"
+		end
+		detected[detectedKey] = proc
+	end
+end
+
 function ProcScience:DetectItemProc(detected, itemLink, slotID)
 	local itemID = self:GetItemIDFromLink(itemLink)
 	if not L.Procs[itemID] then
@@ -101,29 +132,7 @@ function ProcScience:DetectItemProc(detected, itemLink, slotID)
 	end
 
 	local procStats = ProcScienceStats.items[itemID]
-	procStats.itemLink = itemLink
-	if IsWeaponSlot(slotID) then
-		procStats.attackSpeed = ProcScience:GetAttackSpeed(slotID)
-	end
-	procStats.spellName = procInfo.spellName
-	procStats.spellID = procInfo.spellID
-
-	if detected[procInfo.spellName] ~= nil then
-		local proc = detected[procInfo.spellName]
-		if proc.filter then
-			if (proc.filter == "main hand" and slotID == INVSLOT_OFF_HAND) or (proc.filter == "off-hand" and slotID == INVSLOT_MAIN_HAND) then
-				proc.filter = nil
-			end
-		end
-	else
-		local proc = { itemID = itemID, info = procInfo, stats = procStats }
-		if slotID == INVSLOT_MAIN_HAND then
-			proc.filter = "main hand"
-		elseif slotID == INVSLOT_OFF_HAND then
-			proc.filter = "off-hand"
-		end
-		detected[procInfo.spellName] = proc
-	end
+	self:DetectProc(detected, procInfo, procStats, itemLink, slotID)
 end
 
 function ProcScience:GetItemIDFromLink(itemLink)
