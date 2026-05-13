@@ -16,7 +16,7 @@ L.Events = {
 	},
 	SelfHeal = {
 		target = L.TARGET_SELF,
-		trigger = L.TRIGGER_ON_CAST,
+		trigger = L.TRIGGER_ON_HIT,
 		CHAT_MSG_SPELL_SELF_BUFF = true,
 	},
 	SelfAura = {
