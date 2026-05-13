@@ -325,19 +325,19 @@ L.Procs = {
 
 	--region ==== Trinkets ====
 	[19287] = { itemName = "Darkmoon Card: Heroism",   spellID = 23689, spellName = "Heroism",          school = L.SCHOOL.Holy,     events = L.Events.SelfHeal,     superWowEvents = L.Events.SelfSuperWow },
-	[19289] = { itemName = "Darkmoon Card: Maelstrom", spellID = 23686, spellName = "Lightning Strike", school = L.SCHOOL.Nature,   events = L.Events.Damage,       superWowEvents = L.Events.TargetSuperWow },
+	[19289] = { itemName = "Darkmoon Card: Maelstrom", spellID = 23687, spellName = "Lightning Strike", school = L.SCHOOL.Nature,   events = L.Events.Damage,       superWowEvents = L.Events.TargetSuperWow },
 	[11815] = { itemName = "Hand of Justice",          spellID = 15601, spellName = "Hand of Justice",  school = L.SCHOOL.Physical, events = L.Events.ExtraAttacks, superWowEvents = L.Events.SelfSuperWow }, -- 2% chance, 2 sec cooldown
 	[22321] = { itemName = "Heart of Wyrmthalak",      spellID = 27656, spellName = "Flame Lash",       school = L.SCHOOL.Fire,     events = L.Events.Damage,       superWowEvents = L.Events.TargetSuperWow },
 	--endregion
 }
 
 L.Enchants = {
-	[1900] = { enchantName = "Crusader",      spellID = 20007, spellName = "Holy Strength", school = L.SCHOOL.Holy,   events = L.Events.SelfHeal,   superWowEvents = L.Events.SelfSuperWow },
-	[912]  = { enchantName = "Demonslaying",  spellID = 13907, spellName = "Smite Demon",   school = L.SCHOOL.Holy,   events = L.Events.Damage,     superWowEvents = L.Events.TargetSuperWow },
-	[803]  = { enchantName = "Fiery Weapon",  spellID = 13897, spellName = "Fiery Weapon",  school = L.SCHOOL.Fire,   events = L.Events.Damage,     superWowEvents = L.Events.TargetSuperWow },
-	[1894] = { enchantName = "Icy Weapon",    spellID = 20005, spellName = "Chilled",       school = L.SCHOOL.Frost,  events = L.Events.TargetAura, superWowEvents = L.Events.TargetSuperWow},
-	[1898] = { enchantName = "Lifestealing",  spellID = 20004, spellName = "Life Steal",    school = L.SCHOOL.Shadow, events = L.Events.Damage,     superWowEvents = L.Events.TargetSuperWow },
-	[1899] = { enchantName = "Unholy Weapon", spellID = 20006, spellName = "Unholy Curse",  school = L.SCHOOL.Shadow, events = L.Events.TargetAura, superWowEvents = L.Events.TargetSuperWow },
+	[1900] = { enchantName = "Crusader",      enchantID = 20034, spellID = 20007, spellName = "Holy Strength", school = L.SCHOOL.Holy,   events = L.Events.SelfHeal,   superWowEvents = L.Events.SelfSuperWow },
+	[912]  = { enchantName = "Demonslaying",  enchantID = 13915, spellID = 13907, spellName = "Smite Demon",   school = L.SCHOOL.Holy,   events = L.Events.Damage,     superWowEvents = L.Events.TargetSuperWow },
+	[803]  = { enchantName = "Fiery Weapon",  enchantID = 13898, spellID = 13897, spellName = "Fiery Weapon",  school = L.SCHOOL.Fire,   events = L.Events.Damage,     superWowEvents = L.Events.TargetSuperWow },
+	[1894] = { enchantName = "Icy Weapon",    enchantID = 20029, spellID = 20005, spellName = "Chilled",       school = L.SCHOOL.Frost,  events = L.Events.TargetAura, superWowEvents = L.Events.TargetSuperWow},
+	[1898] = { enchantName = "Lifestealing",  enchantID = 20032, spellID = 20004, spellName = "Life Steal",    school = L.SCHOOL.Shadow, events = L.Events.Damage,     superWowEvents = L.Events.TargetSuperWow },
+	[1899] = { enchantName = "Unholy Weapon", enchantID = 20033, spellID = 20006, spellName = "Unholy Curse",  school = L.SCHOOL.Shadow, events = L.Events.TargetAura, superWowEvents = L.Events.TargetSuperWow },
 }
 
 -- 1.12 cannot get the temp enchant ID via GetWeaponEnchantInfo()

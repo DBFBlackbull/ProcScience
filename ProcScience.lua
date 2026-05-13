@@ -20,7 +20,11 @@ local function IsMeleeWeaponSlot(slotID)
 end
 
 local debugEvent = true
-ProcScienceStats = ProcScienceStats or { version = VERSION, items = {} }
+ProcScienceStats = ProcScienceStats or { version = VERSION, items = {}, enchants = {}, tempEnchants = {}, buffs = {} }
+
+function ProcScience:NewStats()
+	return { hits = 0, phantomHits = 0, procs = 0, gcdHits = 0, gcdProcs = 0 }
+end
 
 local function dump(o)
 	if type(o) == 'table' then
@@ -45,7 +49,7 @@ local function dump(o)
 end
 
 function ProcScience:Print(string)
-	DEFAULT_CHAT_FRAME:AddMessage("|cffF0E68C[ProcScience]|cffFFFFFF: "..string)
+	DEFAULT_CHAT_FRAME:AddMessage("|cffF0E68C[ProcScience]|cffFFFFFF: "..tostring(string))
 end
 
 function ProcScience:Dump()
@@ -88,7 +92,7 @@ function ProcScience:GetAttackSpeed(slotID)
 	end
 end
 
-function ProcScience:DetectProc(detected, procInfo, procStats, link, slotID)
+function ProcScience:DetectProc(detected, procInfo, procStats, link, procID, slotID)
 	if IsWeaponSlot(slotID) then
 		procStats.attackSpeed = ProcScience:GetAttackSpeed(slotID)
 	end
@@ -109,7 +113,7 @@ function ProcScience:DetectProc(detected, procInfo, procStats, link, slotID)
 			end
 		end
 	else
-		local proc = { itemID = itemID, info = procInfo, stats = procStats }
+		local proc = { itemID = procID, info = procInfo, stats = procStats }
 		if slotID == INVSLOT_MAIN_HAND then
 			proc.filter = "main hand"
 		elseif slotID == INVSLOT_OFF_HAND then
@@ -117,6 +121,26 @@ function ProcScience:DetectProc(detected, procInfo, procStats, link, slotID)
 		end
 		detected[detectedKey] = proc
 	end
+end
+
+function ProcScience:DetectEnchantProc(detected, itemLink, slotID)
+	local itemEnchantID = self:GetItemEnchantIDFromLink(itemLink)
+	if itemEnchantID == 0 then
+		return
+	end
+
+	local procInfo = L.Enchants[itemEnchantID]
+	if not procInfo then
+		return
+	end
+
+	if ProcScienceStats.enchants[itemEnchantID] == nil then
+		ProcScienceStats.enchants[itemEnchantID] = self:NewStats()
+	end
+
+	local procStats = ProcScienceStats.enchants[itemEnchantID]
+	local enchantLink = string.format("%s|Henchant:%s|h[%s Enchant]|h%s", HIGHLIGHT_FONT_COLOR_CODE, procInfo.enchantID, procInfo.enchantName, FONT_COLOR_CODE_CLOSE)
+	self:DetectProc(detected, procInfo, procStats, enchantLink, itemEnchantID, slotID)
 end
 
 function ProcScience:DetectItemProc(detected, itemLink, slotID)
@@ -132,20 +156,25 @@ function ProcScience:DetectItemProc(detected, itemLink, slotID)
 	end
 
 	local procStats = ProcScienceStats.items[itemID]
-	self:DetectProc(detected, procInfo, procStats, itemLink, slotID)
+	self:DetectProc(detected, procInfo, procStats, itemLink, itemID, slotID)
 end
 
 function ProcScience:GetItemIDFromLink(itemLink)
-	if not itemLink then
-		return
-	end
-
 	local foundID, _ , itemID = string.find(itemLink, "item:(%d+)")
 	if not foundID then
 		return
 	end
 
 	return tonumber(itemID)
+end
+
+function ProcScience:GetItemEnchantIDFromLink(itemLink)
+	local foundID, _ , itemEnchantID = string.find(itemLink, "item:%d+:(%d+)")
+	if not foundID then
+		return
+	end
+
+	return tonumber(itemEnchantID)
 end
 
 function ProcScience:DetectItems()
@@ -155,6 +184,9 @@ function ProcScience:DetectItems()
 		local itemLink = GetInventoryItemLink("player", slotID)
 		if itemLink then
 			self:DetectItemProc(detected, itemLink, slotID)
+			if IsMeleeWeaponSlot(slotID) then
+				self:DetectEnchantProc(detected, itemLink, slotID)
+			end
 		end
 	end
 
@@ -480,6 +512,13 @@ end
 function ProcScience:ResetAll()
 	self:Print("Resetting all proc stats")
 	for spellName, stats in pairs(ProcScienceStats.items) do
+		stats.hits = 0
+		stats.procs = 0
+		stats.gcdHits = 0
+		stats.gcdProcs = 0
+	end
+
+	for id, stats in pairs(ProcScienceStats.enchants) do
 		stats.hits = 0
 		stats.procs = 0
 		stats.gcdHits = 0
