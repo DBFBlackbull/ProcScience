@@ -3,6 +3,7 @@ local COMMIT_HASH = "f90c97f28d146b1ad7781d13ece3860d28f7b3db"
 local SHORT_COMMIT_HASH = "f90c97f"
 local ProcScience = CreateFrame("Frame")
 local L = ProcScience_L
+local debugEvent = false
 
 local INVSLOT_FIRST_EQUIPPED = 1
 local INVSLOT_LAST_EQUIPPED = 18
@@ -19,7 +20,6 @@ local function IsMeleeWeaponSlot(slotID)
 	return slotID == INVSLOT_MAIN_HAND or slotID == INVSLOT_OFF_HAND
 end
 
-local debugEvent = true
 ProcScienceStats = ProcScienceStats or { version = VERSION, items = {}, enchants = {}, tempEnchants = {}, buffs = {} }
 
 function ProcScience:NewStats()
