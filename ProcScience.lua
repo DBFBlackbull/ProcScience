@@ -529,7 +529,7 @@ function ProcScience:PrintStats()
 		return self:Print("No data")
 	end
 
-	for _, procStats in ipairs( {ProcScienceStats.items, ProcScienceStats.enchants}) do
+	for _, procStats in ipairs( {ProcScienceStats.items, ProcScienceStats.enchants, ProcScienceStats.tempEnchants}) do
 		for itemID, stats in pairs(procStats) do
 			if stats.hits > 0 then
 				local chance = stats.procs / stats.hits
@@ -553,23 +553,19 @@ end
 
 function ProcScience:ResetAll()
 	self:Print("Resetting all proc stats")
-	for spellName, stats in pairs(ProcScienceStats.items) do
-		stats.hits = 0
-		stats.procs = 0
-		stats.gcdHits = 0
-		stats.gcdProcs = 0
-	end
-
-	for id, stats in pairs(ProcScienceStats.enchants) do
-		stats.hits = 0
-		stats.procs = 0
-		stats.gcdHits = 0
-		stats.gcdProcs = 0
+	for _, procStats in ipairs( {ProcScienceStats.items, ProcScienceStats.enchants, ProcScienceStats.tempEnchants}) do
+		for id, stats in pairs(procStats) do
+			stats.hits = 0
+			stats.procs = 0
+			stats.gcdHits = 0
+			stats.gcdProcs = 0
+		end
 	end
 end
 
 function ProcScience:ResetTracked()
 	self:Print("Resetting currently tracked proc stats")
+	-- TODO fix this resetting
 	for spellName, proc in pairs(self.tracked) do
 		local stats = ProcScienceStats.items[proc.itemID]
 		stats.hits = 0
