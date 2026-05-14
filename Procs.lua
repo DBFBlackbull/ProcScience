@@ -342,6 +342,7 @@ L.Enchants = {
 
 -- 1.12 cannot get the temp enchant ID via GetWeaponEnchantInfo()
 -- so name and tooltip scanning will be the way it is found
+-- enchantID is unused as there is currently no way to get/set it on the tooltip
 L.TemporaryEnchants = {
 	["Frost Oil"]  = { itemID = 3829, enchantID = 26, spellID = 205, spellName = "Frostbolt",   school = L.SCHOOL.Frost,  events = L.Events.Damage, superWowEvents = L.Events.TargetSuperWow },
 	["Shadow Oil"] = { itemID = 3824, enchantID = 25, spellID = 705, spellName = "Shadow Bolt", school = L.SCHOOL.Shadow, events = L.Events.Damage, superWowEvents = L.Events.TargetSuperWow },

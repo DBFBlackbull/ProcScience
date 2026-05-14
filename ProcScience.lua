@@ -128,6 +128,15 @@ function ProcScience:GetItemEnchantIDFromLink(itemLink)
 	return tonumber(itemEnchantID)
 end
 
+function ProcScience:GetItemLink(itemID)
+	local itemName, itemLink, itemQuality = GetItemInfo(itemID)
+	if itemName and itemLink and itemQuality then
+		local _, _, _, hex = GetItemQualityColor(tonumber(itemQuality))
+		local hyperLink = hex.. "|H".. itemLink .."|h["..itemName.."]|h" .. FONT_COLOR_CODE_CLOSE
+		return hyperLink
+	end
+end
+
 function ProcScience:DetectProc(detected, procInfo, procStats, link, procID, slotID)
 	if IsWeaponSlot(slotID) then
 		procStats.attackSpeed = ProcScience:GetAttackSpeed(slotID)
@@ -177,7 +186,7 @@ function ProcScience:DetectTempEnchantProc(detected, itemLink, slotID)
 	end
 
 	local procStats = ProcScienceStats.tempEnchants[itemTempEnchantName]
-	local link = string.format("%s|Hitem:%s:0:0:0|h[%s]|h%s", HIGHLIGHT_FONT_COLOR_CODE, procInfo.itemID, itemTempEnchantName, FONT_COLOR_CODE_CLOSE)
+	local link = self:GetItemLink(procInfo.itemID)
 	self:DetectProc(detected, procInfo, procStats, link, itemTempEnchantName, slotID)
 end
 
@@ -200,14 +209,13 @@ end
 
 function ProcScience:DetectItemProc(detected, itemLink, slotID)
 	local itemID = self:GetItemIDFromLink(itemLink)
-	if not L.Procs[itemID] then
+	local procInfo = L.Procs[itemID]
+	if not procInfo then
 		return
 	end
 
-	local procInfo = L.Procs[itemID]
-
 	if ProcScienceStats.items[itemID] == nil then
-		ProcScienceStats.items[itemID] = { hits = 0, procs = 0, gcdHits = 0, gcdProcs = 0 }
+		ProcScienceStats.items[itemID] = self:NewStats()
 	end
 
 	local procStats = ProcScienceStats.items[itemID]
@@ -237,6 +245,58 @@ function ProcScience:DetectItems()
 	end
 
 	self.tracked = detected
+end
+
+function ProcScience:GetBuffName(buffIndex)
+	ProcScience_Tooltip:ClearLines()
+	ProcScience_Tooltip:SetPlayerBuff(buffIndex)
+	local line = getglobal(ProcScience_Tooltip:GetName().."TextLeft1")
+	return line:GetText()
+end
+
+function ProcScience:GetBuffProcByName(buffName)
+	for buffID, buffInfo in pairs(L.Buffs) do
+		if buffInfo.buffName == buffName then
+			return buffInfo
+		end
+	end
+end
+
+function ProcScience:DetectBuffProc(detected, buffIndex, buffID)
+	local buffName = self:GetBuffName(buffIndex)
+	local procInfo = L.Buffs[buffID] or self:GetBuffProcByName(buffName)
+	if not procInfo then
+		return
+	end
+
+	if ProcScienceStats.buffs[buffName] == nil then
+		ProcScienceStats.buffs[buffName] = self:NewStats()
+	end
+
+	local procStats = ProcScienceStats.buffs[buffName]
+	local link = self:GetItemLink(procInfo.itemID)
+	self:DetectProc(detected, procInfo, procStats, link, buffName, nil)
+end
+
+function ProcScience:DetectBuffs()
+	local detected = {}
+
+	for buffID = 0 , 200 do
+		local buffIndex, untilCancelled = GetPlayerBuff(buffID) -- Needs to go. Not needed
+		if buffIndex < 1 then
+			return
+		end
+
+		self:Print(string.format("GetPlayerBuff(buffID: %d) buffIndex: %d untilCancelled: %s", buffID, buffIndex, tostring(untilCancelled)))
+		local icon, count, debuffType, spellID = UnitBuff("player", buffIndex)
+		self:Print(string.format("UnitBuff(buffIndex: %d) icon: %s count: %s debuffType: %s spellID: %d", buffIndex, tostring(icon), tostring(count), tostring(debuffType), tostring(spellID)))
+		local spellID2 = GetPlayerBuffID(buffIndex)
+		self:Print(string.format("GetPlayerBuffID(buffIndex: %d) spellID: %s", buffIndex, tostring(spellID2)))
+
+		self:DetectBuffProc(detected, buffIndex, spellID)
+	end
+
+	self.trackedBuffs = detected
 end
 
 function ProcScience:IsGCD()
