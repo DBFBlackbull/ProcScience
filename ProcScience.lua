@@ -417,8 +417,9 @@ function ProcScience:OnCombatLogEvent(timestamp)
 		local _, _, spellDodge, unitDodge = string.find(arg1, "Your (.+) was dodged by (.+)%.")
 		local _, _, spellParry, unitParry = string.find(arg1, "Your (.+) is parried by (.+)%.")
 		local _, _, spellResist, unitResist = string.find(arg1, "Your (.+) was resisted by (.+)%.")
-		spellName = spellName or spellMiss or spellDodge or spellParry or spellResist
-		unit = unit or unitMiss or unitDodge or unitParry or unitResist
+		local _, _, spellImmune, unitImmune = string.find(arg1, "Your (.+) failed. (.+) is immune%.")
+		spellName = spellName or spellMiss or spellDodge or spellParry or spellResist or spellImmune
+		unit = unit or unitMiss or unitDodge or unitParry or unitResist or unitImmune
 		return self:CheckProcEvent(timestamp, event, unit, spellName)
 	end
 
@@ -490,22 +491,25 @@ function ProcScience:PrintStats()
 		return self:Print("No data")
 	end
 
-	for itemID, stats in pairs(ProcScienceStats.items) do
-		if stats.hits > 0 then
-			local chance = stats.procs / stats.hits
-			local confidence = 1.96 * math.sqrt(chance * (1 - chance) / stats.hits)
-			local output = format("%s Hits: %d Procs: %d Chance: %.2f%% ±%.2f%%",
-					stats.itemLink, stats.hits, stats.procs, chance * 100, confidence * 100)
+	for _, procStats in ipairs( {ProcScienceStats.items, ProcScienceStats.enchants}) do
+		for itemID, stats in pairs(procStats) do
+			if stats.hits > 0 then
+				local chance = stats.procs / stats.hits
+				local confidence = 1.96 * math.sqrt(chance * (1 - chance) / stats.hits)
+				local output = format("%s Hits: %d Procs: %d Chance: %.2f%% ±%.2f%%",
+						stats.itemLink, stats.hits, stats.procs, chance * 100, confidence * 100)
 
-			if stats.attackSpeed and stats.attackSpeed > 0 then
-				output = output..format(" PPM: %.3f ±%.3f",
-						chance * 60 / stats.attackSpeed, confidence * 60 / stats.attackSpeed)
+				if stats.attackSpeed and stats.attackSpeed > 0 then
+					output = output..format(" PPM: %.3f ±%.3f",
+							chance * 60 / stats.attackSpeed, confidence * 60 / stats.attackSpeed)
+				end
+
+				self:Print(output)
+			else
+				self:Print(format("%s No hits", stats.itemLink))
 			end
-
-			self:Print(output)
-		else
-			self:Print(format("%s No hits", stats.itemLink))
 		end
+
 	end
 end
 
