@@ -659,13 +659,13 @@ function ProcScience:OnEvent()
 		return ProcScience:OnAddonLoaded()
 	end
 
+	if event == "PLAYER_TARGET_CHANGED" then
+		return ProcScience:OnTargetChanged()
+	end
+
 	if event == "PLAYER_ENTERING_WORLD" then
 		ProcScience:SetGlobalCooldownSpellSlot()
 		return ProcScience:DetectItems()
-	end
-
-	if event == "PLAYER_TARGET_CHANGED" then
-		return ProcScience:OnTargetChanged()
 	end
 
 	if event == "UNIT_INVENTORY_CHANGED" and arg1 == "player" then
