@@ -92,6 +92,24 @@ function ProcScience:GetAttackSpeed(slotID)
 	end
 end
 
+function ProcScience:GetItemIDFromLink(itemLink)
+	local foundID, _ , itemID = string.find(itemLink, "item:(%d+)")
+	if not foundID then
+		return
+	end
+
+	return tonumber(itemID)
+end
+
+function ProcScience:GetItemEnchantIDFromLink(itemLink)
+	local foundID, _ , itemEnchantID = string.find(itemLink, "item:%d+:(%d+)")
+	if not foundID then
+		return
+	end
+
+	return tonumber(itemEnchantID)
+end
+
 function ProcScience:DetectProc(detected, procInfo, procStats, link, procID, slotID)
 	if IsWeaponSlot(slotID) then
 		procStats.attackSpeed = ProcScience:GetAttackSpeed(slotID)
@@ -157,24 +175,6 @@ function ProcScience:DetectItemProc(detected, itemLink, slotID)
 
 	local procStats = ProcScienceStats.items[itemID]
 	self:DetectProc(detected, procInfo, procStats, itemLink, itemID, slotID)
-end
-
-function ProcScience:GetItemIDFromLink(itemLink)
-	local foundID, _ , itemID = string.find(itemLink, "item:(%d+)")
-	if not foundID then
-		return
-	end
-
-	return tonumber(itemID)
-end
-
-function ProcScience:GetItemEnchantIDFromLink(itemLink)
-	local foundID, _ , itemEnchantID = string.find(itemLink, "item:%d+:(%d+)")
-	if not foundID then
-		return
-	end
-
-	return tonumber(itemEnchantID)
 end
 
 function ProcScience:DetectItems()
