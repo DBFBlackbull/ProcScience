@@ -64,6 +64,7 @@ function ProcScience:Dump()
 	self:Print("player = "..dump(self.player))
 	self:Print("sources = "..dump(self.sources))
 	self:Print("procs = "..dump(self.tracked))
+	self:Print("buff procs = "..dump(self.trackedBuffs))
 end
 
 function ProcScience:PopulateSources()
@@ -290,25 +291,29 @@ end
 function ProcScience:DetectBuffs()
 	local detected = {}
 
-	for buffID = 1 , 3 do
-		local icon, count, spellID = UnitBuff("player", buffID)
-		self:Print(string.format("UnitBuff(buffID: %s) icon: %s count: %s spellID: %s", tostring(buffID), tostring(icon), tostring(count), tostring(spellID)))
-		self:Print("")
+	local buffIndex = 1
+	local icon = "someIcon"
+	local _, spellID
+	while icon do
+		icon, _, spellID = UnitBuff("player", buffIndex)
+		if icon then
+			self:DetectBuffProc(detected, buffIndex, spellID)
+		end
 
-		--self:DetectBuffProc(detected, buffIndex, spellID)
+		buffIndex = buffIndex + 1
 	end
 
-	--if self.log >= LOG_LEVEL.TRACKING then
-	--	if self.trackedBuffs ~= nil then
-	--		for spellName, proc in pairs(detected) do
-	--			if self.trackedBuffs[spellName] == nil or self.trackedBuffs[spellName].filter ~= proc.filter then
-	--				self:Print("Tracking "..proc.stats.itemLink.." in "..(proc.filter or "both hands"))
-	--			end
-	--		end
-	--	end
-	--end
-	--
-	--self.trackedBuffs = detected
+	if self.log >= LOG_LEVEL.TRACKING then
+		if self.trackedBuffs ~= nil then
+			for spellName, proc in pairs(detected) do
+				if self.trackedBuffs[spellName] == nil or self.trackedBuffs[spellName].filter ~= proc.filter then
+					self:Print("Tracking "..proc.stats.itemLink.." in "..(proc.filter or "both hands"))
+				end
+			end
+		end
+	end
+
+	self.trackedBuffs = detected
 end
 
 function ProcScience:IsGCD()
@@ -744,9 +749,10 @@ function ProcScience:OnEvent()
 		return ProcScience:DetectItems()
 	end
 
-	--if event == "UNIT_AURA" and arg1 == "player" then
-	--	return ProcScience:DetectBuffs()
-	--end
+	if event == "UNIT_AURA" and arg1 == "player" then
+		return ProcScience:Print(string.format("%s %s %s %s", event, tostring(arg1), tostring(arg2), tostring(arg3)))
+		--return ProcScience:DetectBuffs()
+	end
 
 	if event == "CHAT_MSG_COMBAT_SELF_HITS" or
 			event == "CHAT_MSG_SPELL_SELF_DAMAGE" or
