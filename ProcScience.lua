@@ -3,7 +3,14 @@ local COMMIT_HASH = "f90c97f28d146b1ad7781d13ece3860d28f7b3db"
 local SHORT_COMMIT_HASH = "f90c97f"
 local ProcScience = CreateFrame("Frame")
 local L = ProcScience_L
-local debugEvent = false
+local LOG_LEVEL = {
+	NONE = 0,
+	TRACKING = 1,
+	DEBUG = 2,
+	SELF = 3,
+	SAY = 4,
+	GROUP = 5,
+}
 
 local INVSLOT_FIRST_EQUIPPED = 1
 local INVSLOT_LAST_EQUIPPED = 18
@@ -20,7 +27,7 @@ local function IsMeleeWeaponSlot(slotID)
 	return slotID == INVSLOT_MAIN_HAND or slotID == INVSLOT_OFF_HAND
 end
 
-ProcScienceStats = ProcScienceStats or { version = VERSION, items = {}, enchants = {}, tempEnchants = {}, buffs = {} }
+ProcScienceStats = ProcScienceStats or { version = VERSION, log = LOG_LEVEL.TRACKING, items = {}, enchants = {}, tempEnchants = {}, buffs = {} }
 
 function ProcScience:NewStats()
 	return { hits = 0, phantomHits = 0, procs = 0, gcdHits = 0, gcdProcs = 0 }
@@ -236,10 +243,12 @@ function ProcScience:DetectItems()
 		end
 	end
 
-	if self.tracked ~= nil then
-		for spellName, proc in pairs(detected) do
-			if self.tracked[spellName] == nil or self.tracked[spellName].filter ~= proc.filter then
-				self:Print("Tracking "..proc.stats.itemLink.." in "..(proc.filter or "both hands"))
+	if self.log >= LOG_LEVEL.TRACKING then
+		if self.tracked ~= nil then
+			for spellName, proc in pairs(detected) do
+				if self.tracked[spellName] == nil or self.tracked[spellName].filter ~= proc.filter then
+					self:Print("Tracking "..proc.stats.itemLink.." in "..(proc.filter or "both hands"))
+				end
 			end
 		end
 	end
@@ -296,10 +305,12 @@ function ProcScience:DetectBuffs()
 		self:DetectBuffProc(detected, buffIndex, spellID)
 	end
 
-	if self.trackedBuffs ~= nil then
-		for spellName, proc in pairs(detected) do
-			if self.trackedBuffs[spellName] == nil or self.trackedBuffs[spellName].filter ~= proc.filter then
-				self:Print("Tracking "..proc.stats.itemLink.." in "..(proc.filter or "both hands"))
+	if self.log >= LOG_LEVEL.TRACKING then
+		if self.trackedBuffs ~= nil then
+			for spellName, proc in pairs(detected) do
+				if self.trackedBuffs[spellName] == nil or self.trackedBuffs[spellName].filter ~= proc.filter then
+					self:Print("Tracking "..proc.stats.itemLink.." in "..(proc.filter or "both hands"))
+				end
 			end
 		end
 	end
@@ -336,7 +347,7 @@ function ProcScience:UpdateProcHits(source, isOffHand, amount)
 end
 
 function ProcScience:CheckProcEvent(timestamp, event, unit, spellName, spellID)
-	if debugEvent and event ~= "UNIT_CASTEVENT" then
+	if self.log == LOG_LEVEL.DEBUG and event ~= "UNIT_CASTEVENT" then
 		local target = ""
 		if unit == self.player.name then
 			target = "self"
@@ -363,7 +374,19 @@ function ProcScience:CheckProcEvent(timestamp, event, unit, spellName, spellID)
 		local isGCD = self:IsGCD()
 		local procMessage = proc.stats.itemLink.." proced "..proc.stats.spellName
 
-		self:Print(procMessage)
+		if self.log == LOG_LEVEL.SELF then
+			self:Print(procMessage)
+		elseif self.log == LOG_LEVEL.SAY then
+			SendChatMessage(procMessage, "SAY")
+		elseif self.log == LOG_LEVEL.GROUP then
+			if GetNumRaidMembers() > 0 then
+				SendChatMessage(procMessage, "RAID")
+			elseif GetNumPartyMembers() > 0 then
+				SendChatMessage(procMessage, "PARTY")
+			else
+				SendChatMessage(procMessage, "SAY")
+			end
+		end
 		proc.stats.procs = proc.stats.procs + 1
 		proc.timestamp = timestamp
 		if isGCD then
@@ -402,6 +425,7 @@ function ProcScience:OnAddonLoaded()
 	self.tracked = {}
 	self.trackedBuffs = {}
 	self.pendingAE = {}
+	self.log = ProcScienceStats.log or LOG_LEVEL.TRACKING
 	self:PopulateSources()
 
 	self:Print("Loaded ("..SHORT_COMMIT_HASH..")")
@@ -480,7 +504,7 @@ function ProcScience:OnUnitCastEvent(timestamp)
 	local spellName = SpellInfo(spellID)
 
 	-- filter out auto attack spells
-	if debugEvent and spellID ~= 6603 then
+	if self.log == LOG_LEVEL.DEBUG and spellID ~= 6603 then
 		local target = ""
 		if targetGuid == self.player.guid then
 			target = "self"
@@ -535,7 +559,11 @@ function ProcScience:OnCombatLogEvent(timestamp)
 
 	if event == "CHAT_MSG_SPELL_PERIODIC_CREATURE_DAMAGE" or
 			event == "CHAT_MSG_SPELL_PERIODIC_HOSTILEPLAYER_DAMAGE" then
-		local _, _, unit, spellName = string.find(arg1, "(.+) is afflicted by (.+)")
+		-- Must check for stacks first to avoid adding the stack number to the spellName
+		local _, _, unit, spellName, stacks = string.find(arg1, "(.+) is afflicted by (.+) %((%d+)%)%.")
+		if not unit and not spellName then
+			_, _, unit, spellName = string.find(arg1, "(.+) is afflicted by (.+)%.")
+		end
 		-- Track instant attack spells
 		if self.sources.Damage[spellName] then
 			return self:UpdateProcHits(spellName)
@@ -561,7 +589,11 @@ function ProcScience:OnCombatLogEvent(timestamp)
 	end
 
 	if event == "CHAT_MSG_SPELL_PERIODIC_SELF_BUFFS" then
-		local _, _, spellName = string.find(arg1, "You gain (.+)")
+		-- Must check for stacks first to avoid adding the stack number to the spellName
+		local _, _, spellName, stacks = string.find(arg1, "You gain (.+) %((%d+)%)%.")
+		if not spellName then
+			_, _, spellName = string.find(arg1, "You gain (.+)%.")
+		end
 		return self:CheckProcEvent(timestamp, event, self.player.name, spellName)
 	end
 end
@@ -594,11 +626,14 @@ end
 
 function ProcScience:PrintStats()
 	self:Print("Proc stats ("..SHORT_COMMIT_HASH.."):")
-	if next(ProcScienceStats.items) == nil then
+	if not next(ProcScienceStats.items) and
+			not next(ProcScienceStats.enchants) and
+			not next(ProcScienceStats.tempEnchants) and
+			not next(ProcScienceStats.buffs) then
 		return self:Print("No data")
 	end
 
-	for _, procStats in ipairs( {ProcScienceStats.items, ProcScienceStats.enchants, ProcScienceStats.tempEnchants}) do
+	for _, procStats in ipairs( {ProcScienceStats.items, ProcScienceStats.enchants, ProcScienceStats.tempEnchants, ProcScienceStats.buffs}) do
 		for itemID, stats in pairs(procStats) do
 			if stats.hits > 0 then
 				local chance = stats.procs / stats.hits
@@ -620,9 +655,36 @@ function ProcScience:PrintStats()
 	end
 end
 
+function ProcScience:ChangeLogLevel(msg)
+	local _, _, logLevel = string.find(msg, "log (.+)")
+	if logLevel == "none" then
+		ProcScienceStats.log = LOG_LEVEL.NONE
+		ProcScience:Print("Logging nothing")
+	elseif logLevel == "debug" then
+		ProcScienceStats.log = LOG_LEVEL.DEBUG
+		ProcScience:Print("Logging all tracked events")
+	elseif logLevel == "tracking" then
+		ProcScienceStats.log = LOG_LEVEL.TRACKING
+		ProcScience:Print("Logging equipping items with procs")
+	elseif logLevel == "self" then
+		ProcScienceStats.log = LOG_LEVEL.SELF
+		ProcScience:Print("Logging each time a proc occurs privately")
+	elseif logLevel == "say" then
+		ProcScienceStats.log = LOG_LEVEL.SAY
+		ProcScience:Print("Logging each time a proc occurs in /say")
+	elseif logLevel == "group" then
+		ProcScienceStats.log = LOG_LEVEL.GROUP
+		ProcScience:Print("Logging each time a proc occurs in /party or /raid")
+	else
+		ProcScience:Print("Missing argument for log level. Usage: /procs log <none|debug|tracking|self|say|group>")
+	end
+
+	self.log = ProcScienceStats.log
+end
+
 function ProcScience:ResetAll()
 	self:Print("Resetting all proc stats")
-	for _, procStats in ipairs( {ProcScienceStats.items, ProcScienceStats.enchants, ProcScienceStats.tempEnchants}) do
+	for _, procStats in ipairs( {ProcScienceStats.items, ProcScienceStats.enchants, ProcScienceStats.tempEnchants, ProcScienceStats.buffs}) do
 		for id, stats in pairs(procStats) do
 			stats.hits = 0
 			stats.procs = 0
@@ -748,6 +810,7 @@ function ProcScience:RegisterEvents()
 end
 
 
+
 SLASH_PROCS1 = "/procs"
 SlashCmdList["PROCS"] = function(msg)
 	if msg == "reset all" then
@@ -758,6 +821,8 @@ SlashCmdList["PROCS"] = function(msg)
 		ProcScience:Dump()
 	elseif msg == "" then
 		ProcScience:PrintStats()
+	elseif string.find(msg, "log (.+)") then
+		ProcScience:ChangeLogLevel(msg)
 	else
 		local _, _, cmd, arg = string.find(msg, "%s?(%w+)%s?(.*)")
 		if cmd == "reset" and arg ~= "" then
