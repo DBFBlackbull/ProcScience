@@ -290,32 +290,25 @@ end
 function ProcScience:DetectBuffs()
 	local detected = {}
 
-	for buffID = 0 , 200 do
-		local buffIndex, untilCancelled = GetPlayerBuff(buffID) -- Needs to go. Not needed
-		if buffIndex < 1 then
-			return
-		end
+	for buffID = 1 , 3 do
+		local icon, count, spellID = UnitBuff("player", buffID)
+		self:Print(string.format("UnitBuff(buffID: %s) icon: %s count: %s spellID: %s", tostring(buffID), tostring(icon), tostring(count), tostring(spellID)))
+		self:Print("")
 
-		self:Print(string.format("GetPlayerBuff(buffID: %d) buffIndex: %d untilCancelled: %s", buffID, buffIndex, tostring(untilCancelled)))
-		local icon, count, debuffType, spellID = UnitBuff("player", buffIndex)
-		self:Print(string.format("UnitBuff(buffIndex: %d) icon: %s count: %s debuffType: %s spellID: %d", buffIndex, tostring(icon), tostring(count), tostring(debuffType), tostring(spellID)))
-		local spellID2 = GetPlayerBuffID(buffIndex)
-		self:Print(string.format("GetPlayerBuffID(buffIndex: %d) spellID: %s", buffIndex, tostring(spellID2)))
-
-		self:DetectBuffProc(detected, buffIndex, spellID)
+		--self:DetectBuffProc(detected, buffIndex, spellID)
 	end
 
-	if self.log >= LOG_LEVEL.TRACKING then
-		if self.trackedBuffs ~= nil then
-			for spellName, proc in pairs(detected) do
-				if self.trackedBuffs[spellName] == nil or self.trackedBuffs[spellName].filter ~= proc.filter then
-					self:Print("Tracking "..proc.stats.itemLink.." in "..(proc.filter or "both hands"))
-				end
-			end
-		end
-	end
-
-	self.trackedBuffs = detected
+	--if self.log >= LOG_LEVEL.TRACKING then
+	--	if self.trackedBuffs ~= nil then
+	--		for spellName, proc in pairs(detected) do
+	--			if self.trackedBuffs[spellName] == nil or self.trackedBuffs[spellName].filter ~= proc.filter then
+	--				self:Print("Tracking "..proc.stats.itemLink.." in "..(proc.filter or "both hands"))
+	--			end
+	--		end
+	--	end
+	--end
+	--
+	--self.trackedBuffs = detected
 end
 
 function ProcScience:IsGCD()
@@ -751,6 +744,10 @@ function ProcScience:OnEvent()
 		return ProcScience:DetectItems()
 	end
 
+	--if event == "UNIT_AURA" and arg1 == "player" then
+	--	return ProcScience:DetectBuffs()
+	--end
+
 	if event == "CHAT_MSG_COMBAT_SELF_HITS" or
 			event == "CHAT_MSG_SPELL_SELF_DAMAGE" or
 			event == "CHAT_MSG_SPELL_PERIODIC_CREATURE_DAMAGE" or
@@ -765,9 +762,7 @@ function ProcScience:OnEvent()
 	end
 
 	if event == "RAW_COMBATLOG" then
-		if arg1 ~= "CHAT_MSG_COMBAT_SELF_HITS" and arg1 ~= "CHAT_MSG_COMBAT_SELF_MISSES" then
-			return ProcScience:Print(format("%s %s", arg1, arg2))
-		end
+		--return ProcScience:Print(string.format("%s %s %s %s", event, tostring(arg1), tostring(arg2), tostring(arg3)))
 	end
 
 	if event == "LOSS_OF_CONTROL_ADDED" or event == "LOSS_OF_CONTROL_UPDATE" then
@@ -798,6 +793,9 @@ function ProcScience:RegisterEvents()
 	self:RegisterEvent("CHAT_MSG_SPELL_PERIODIC_SELF_BUFFS")
 	-- track windfury "You gain Windfury weapon" attack power buff
 	-- track "You gain Holy Strength" crusader strength buff
+
+	self:RegisterEvent("UNIT_AURA")
+	self:RegisterEvent("UNIT_AURASTATE")
 
 	if self.superWowActive then
 		self:RegisterEvent("UNIT_CASTEVENT")
