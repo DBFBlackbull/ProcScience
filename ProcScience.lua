@@ -296,6 +296,14 @@ function ProcScience:DetectBuffs()
 		self:DetectBuffProc(detected, buffIndex, spellID)
 	end
 
+	if self.trackedBuffs ~= nil then
+		for spellName, proc in pairs(detected) do
+			if self.trackedBuffs[spellName] == nil or self.trackedBuffs[spellName].filter ~= proc.filter then
+				self:Print("Tracking "..proc.stats.itemLink.." in "..(proc.filter or "both hands"))
+			end
+		end
+	end
+
 	self.trackedBuffs = detected
 end
 
@@ -312,13 +320,15 @@ function ProcScience:UpdateProcHits(source, isOffHand, amount)
 	isOffHand = isOffHand or false
 	amount = amount or 1
 	local isGCD = self:IsGCD()
-	for spellName, proc in pairs(self.tracked) do
-		if proc.filter == nil or (proc.filter == "main hand" and not isOffHand and not self.player.disarmed) or (proc.filter == "off-hand" and isOffHand) then
-			local trigger = proc.info.events.trigger
-			if trigger == L.TRIGGER_ON_HIT or not self.sources.AreaEffect[source] or self.pendingAE[source] then
-				proc.stats.hits = proc.stats.hits + amount
-				if isGCD then
-					proc.stats.gcdHits = proc.stats.gcdHits + amount
+	for _, tracked in ipairs({self.tracked, self.trackedBuffs}) do
+		for spellName, proc in pairs(tracked) do
+			if proc.filter == nil or (proc.filter == "main hand" and not isOffHand and not self.player.disarmed) or (proc.filter == "off-hand" and isOffHand) then
+				local trigger = proc.info.events.trigger
+				if trigger == L.TRIGGER_ON_HIT or not self.sources.AreaEffect[source] or self.pendingAE[source] then
+					proc.stats.hits = proc.stats.hits + amount
+					if isGCD then
+						proc.stats.gcdHits = proc.stats.gcdHits + amount
+					end
 				end
 			end
 		end
@@ -336,7 +346,8 @@ function ProcScience:CheckProcEvent(timestamp, event, unit, spellName, spellID)
 		self:Print(string.format("%s %s %s unit == %s", event, spellName, unit, target))
 	end
 
-	local proc = self.tracked[spellID] or self.tracked[spellName]
+	local trackKey = spellID or spellName
+	local proc = self.tracked[trackKey] or self.trackedBuffs[trackKey]
 	if not proc then
 		return
 	end
@@ -389,6 +400,7 @@ function ProcScience:OnAddonLoaded()
 	}
 
 	self.tracked = {}
+	self.trackedBuffs = {}
 	self.pendingAE = {}
 	self:PopulateSources()
 
@@ -456,7 +468,7 @@ end
 --end
 
 function ProcScience:OnUnitCastEvent(timestamp)
-	if next(self.tracked) == nil then
+	if next(self.tracked) == nil and next(self.trackedBuffs) == nil then
 		return
 	end
 
@@ -491,7 +503,7 @@ function ProcScience:OnUnitCastEvent(timestamp)
 end
 
 function ProcScience:OnCombatLogEvent(timestamp)
-	if next(self.tracked) == nil then
+	if next(self.tracked) == nil and next(self.trackedBuffs) == nil then
 		return
 	end
 
@@ -523,10 +535,7 @@ function ProcScience:OnCombatLogEvent(timestamp)
 
 	if event == "CHAT_MSG_SPELL_PERIODIC_CREATURE_DAMAGE" or
 			event == "CHAT_MSG_SPELL_PERIODIC_HOSTILEPLAYER_DAMAGE" then
-		local _, _, unit, spellName, stacks = string.find(arg1, "(.+) is afflicted by (.+) %((%d+)%)%.")
-		if not unit and not spellName then
-			_, _, unit, spellName = string.find(arg1, "(.+) is afflicted by (.+)%.")
-		end
+		local _, _, unit, spellName = string.find(arg1, "(.+) is afflicted by (.+)")
 		-- Track instant attack spells
 		if self.sources.Damage[spellName] then
 			return self:UpdateProcHits(spellName)
@@ -544,15 +553,15 @@ function ProcScience:OnCombatLogEvent(timestamp)
 	if event == "CHAT_MSG_SPELL_SELF_BUFF" then
 		local _, _, spellExtraAttack = string.find(arg1, "You gain %d extra attacks? through (.+)%.")
 		local _, _, spellHeal = string.find(arg1, "Your (.+) heals you for %d+")
+		-- Add mana
+		-- Add energy
+
 		local spellName = spellExtraAttack or spellHeal
 		return self:CheckProcEvent(timestamp, event, self.player.name, spellName)
 	end
 
 	if event == "CHAT_MSG_SPELL_PERIODIC_SELF_BUFFS" then
-		local _, _, spellName, stacks = string.find(arg1, "You gain (.+) %((%d+)%)%.")
-		if not spellName then
-			_, _, spellName = string.find(arg1, "You gain (.+)%.")
-		end
+		local _, _, spellName = string.find(arg1, "You gain (.+)")
 		return self:CheckProcEvent(timestamp, event, self.player.name, spellName)
 	end
 end
@@ -628,6 +637,14 @@ function ProcScience:ResetTracked()
 	-- TODO fix this resetting
 	for spellName, proc in pairs(self.tracked) do
 		local stats = ProcScienceStats.items[proc.itemID]
+		stats.hits = 0
+		stats.procs = 0
+		stats.gcdHits = 0
+		stats.gcdProcs = 0
+	end
+
+	for spellName, proc in pairs(self.trackedBuffs) do
+		local stats = ProcScienceStats.buffs[proc.itemID]
 		stats.hits = 0
 		stats.procs = 0
 		stats.gcdHits = 0
