@@ -354,7 +354,7 @@ function ProcScience:CheckProcEvent(timestamp, event, unit, spellName, spellID)
 		elseif unit == self.player.target then
 			target = "target"
 		end
-		self:Print(string.format("%s %s %s unit == %s", event, spellName, unit, target))
+		self:Print(string.format("%s %s %s unit == %s", event, tostring(spellName), tostring(unit), target))
 	end
 
 	local trackKey = spellID or spellName
@@ -581,10 +581,10 @@ function ProcScience:OnCombatLogEvent(timestamp)
 	if event == "CHAT_MSG_SPELL_SELF_BUFF" then
 		local _, _, spellExtraAttack = string.find(arg1, "You gain %d extra attacks? through (.+)%.")
 		local _, _, spellHeal = string.find(arg1, "Your (.+) heals you for %d+")
-		-- Add mana
+		local _, _, spellMana = string.find(arg1, "You gain %d+ Mana from (.+)%.")
 		-- Add energy
 
-		local spellName = spellExtraAttack or spellHeal
+		local spellName = spellExtraAttack or spellHeal or spellMana
 		return self:CheckProcEvent(timestamp, event, self.player.name, spellName)
 	end
 
