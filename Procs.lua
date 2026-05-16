@@ -340,16 +340,13 @@ L.Enchants = {
 	[1899] = { enchantName = "Unholy Weapon", enchantID = 20033, spellID = 20006, spellName = "Unholy Curse",  school = L.SCHOOL.Shadow, events = L.Events.TargetAura, superWowEvents = L.Events.TargetSuperWow },
 }
 
+-- 1.12 cannot get the itemTempEnchantID via GetWeaponEnchantInfo()
+-- Suggestion to add getter to superWoW: https://github.com/balakethelock/SuperWoW/issues/100
+-- Until then we use tooltip scanning and Aura Name
 L.TemporaryEnchants = {
 	[26] = { enchantName = "Frost Oil",  enchantID = 3595, spellID = 205, spellName = "Frostbolt",   itemID = 3829, school = L.SCHOOL.Frost,  events = L.Events.Damage, superWowEvents = L.Events.TargetSuperWow },
 	[25] = { enchantName = "Shadow Oil", enchantID = 3594, spellID = 705, spellName = "Shadow Bolt", itemID = 3824, school = L.SCHOOL.Shadow, events = L.Events.Damage, superWowEvents = L.Events.TargetSuperWow },
 }
--- 1.12 cannot get the itemTempEnchantID via GetWeaponEnchantInfo()
--- Suggestion to add getter to superWoW: https://github.com/balakethelock/SuperWoW/issues/100
--- Until then we use tooltip scanning and Aura Name
-for _, tempEnchantProc in pairs(L.TemporaryEnchants) do
-	L.TemporaryEnchants[tempEnchantProc.enchantName] = tempEnchantProc
-end
 
 L.Buffs = {
 	[15852] = { itemID = 12217, buffName = "Dragonbreath Chili", spellID = 15851, spellName = "Dragonbreath Chili", school = L.SCHOOL.Fire, events = L.Events.Damage, superWowEvents = L.Events.TargetSuperWow },

@@ -27,7 +27,7 @@ local function IsMeleeWeaponSlot(slotID)
 	return slotID == INVSLOT_MAIN_HAND or slotID == INVSLOT_OFF_HAND
 end
 
-ProcScienceStats = ProcScienceStats or { version = VERSION, log = LOG_LEVEL.TRACKING, items = {}, enchants = {}, tempEnchants = {}, buffs = {} }
+ProcScienceStats = ProcScienceStats or { version = VERSION, log = LOG_LEVEL.TRACKING, procs = {} }
 
 function ProcScience:NewStats()
 	return { hits = 0, phantomHits = 0, procs = 0, gcdHits = 0, gcdProcs = 0 }
@@ -107,11 +107,10 @@ function ProcScience:GetItemTempEnchantProc(slotID)
 		local line = getglobal(ProcScience_Prefix.."TextLeft"..i)
 		local text = line:GetText()
 		if text then
-			for tempEnchantName, proc in pairs(L.TemporaryEnchants) do
-				local pattern = "^" .. tempEnchantName .. " %(%d+ min%)$"
-				local found = string.find(text, pattern)
-				if found then
-					return tempEnchantName, proc
+			for itemTempEnchantID, procInfo in pairs(L.TemporaryEnchants) do
+				local pattern = "^".. procInfo.enchantName .. " %(%d+ min%)$"
+				if string.find(text, pattern) then
+					return itemTempEnchantID, procInfo
 				end
 			end
 		end
@@ -157,7 +156,7 @@ function ProcScience:DetectProc(detected, procInfo, procStats, link, procID, slo
 			end
 		end
 	else
-		local proc = { itemID = procID, info = procInfo, stats = procStats }
+		local proc = { procID = procID, info = procInfo, stats = procStats }
 		if slotID == INVSLOT_MAIN_HAND then
 			proc.filter = "main hand"
 		elseif slotID == INVSLOT_OFF_HAND then
@@ -175,18 +174,19 @@ function ProcScience:DetectTempEnchantProc(detected, itemLink, slotID)
 		return
 	end
 
-	local itemTempEnchantName, procInfo = self:GetItemTempEnchantProc(slotID)
-	if not itemTempEnchantName then
+	local itemTempEnchantID, procInfo = self:GetItemTempEnchantProc(slotID)
+	if not procInfo then
 		return
 	end
 
-	if ProcScienceStats.tempEnchants[itemTempEnchantName] == nil then
-		ProcScienceStats.tempEnchants[itemTempEnchantName] = self:NewStats()
+	local procID = "tempEnchant:" .. itemTempEnchantID
+	if ProcScienceStats.procs[procID] == nil then
+		ProcScienceStats.procs[procID] = self:NewStats()
 	end
 
-	local procStats = ProcScienceStats.tempEnchants[itemTempEnchantName]
+	local procStats = ProcScienceStats.procs[procID]
 	local link = self:GetItemLink(procInfo.itemID)
-	self:DetectProc(detected, procInfo, procStats, link, itemTempEnchantName, slotID)
+	self:DetectProc(detected, procInfo, procStats, link, procID, slotID)
 end
 
 
@@ -197,13 +197,14 @@ function ProcScience:DetectEnchantProc(detected, itemLink, slotID)
 		return
 	end
 
-	if ProcScienceStats.enchants[itemEnchantID] == nil then
-		ProcScienceStats.enchants[itemEnchantID] = self:NewStats()
+	local procID = "enchant:"..itemEnchantID
+	if ProcScienceStats.procs[procID] == nil then
+		ProcScienceStats.procs[procID] = self:NewStats()
 	end
 
-	local procStats = ProcScienceStats.enchants[itemEnchantID]
+	local procStats = ProcScienceStats.procs[procID]
 	local enchantLink = string.format("%s|Henchant:%s|h[%s Enchant]|h%s", HIGHLIGHT_FONT_COLOR_CODE, procInfo.enchantID, procInfo.enchantName, FONT_COLOR_CODE_CLOSE)
-	self:DetectProc(detected, procInfo, procStats, enchantLink, itemEnchantID, slotID)
+	self:DetectProc(detected, procInfo, procStats, enchantLink, procID, slotID)
 end
 
 function ProcScience:DetectItemProc(detected, itemLink, slotID)
@@ -213,12 +214,13 @@ function ProcScience:DetectItemProc(detected, itemLink, slotID)
 		return
 	end
 
-	if ProcScienceStats.items[itemID] == nil then
-		ProcScienceStats.items[itemID] = self:NewStats()
+	local procID = "item:" .. itemID
+	if ProcScienceStats.procs[procID] == nil then
+		ProcScienceStats.procs[procID] = self:NewStats()
 	end
 
-	local procStats = ProcScienceStats.items[itemID]
-	self:DetectProc(detected, procInfo, procStats, itemLink, itemID, slotID)
+	local procStats = ProcScienceStats.procs[procID]
+	self:DetectProc(detected, procInfo, procStats, itemLink, procID, slotID)
 end
 
 function ProcScience:DetectItems()
@@ -256,42 +258,43 @@ function ProcScience:GetBuffName(buffIndex)
 end
 
 function ProcScience:GetBuffProcByName(buffName)
-	for buffID, buffInfo in pairs(L.Buffs) do
-		if buffInfo.buffName == buffName then
-			return buffInfo
+	for buffID, procInfo in pairs(L.Buffs) do
+		if procInfo.buffName == buffName then
+			return buffID, procInfo
 		end
 	end
 end
 
-function ProcScience:DetectBuffProc(detected, buffIndex, buffID)
-	local buffName = self:GetBuffName(buffIndex)
-	local procInfo = L.Buffs[buffID] or self:GetBuffProcByName(buffName)
+function ProcScience:DetectBuffProc(detected, buffIndex)
+	local buffID = self.buffIDFunc(buffIndex)
+	local procInfo = buffID and L.Buffs[buffID]
 	if not procInfo then
-		return
+		buffID, procInfo = self:GetBuffProcByName(self:GetBuffName(buffIndex))
+		if not procInfo then
+			return
+		end
 	end
 
-	if ProcScienceStats.buffs[buffName] == nil then
-		ProcScienceStats.buffs[buffName] = self:NewStats()
+	local procID = "buff:"..buffID
+	if ProcScienceStats.procs[procID] == nil then
+		ProcScienceStats.procs[procID] = self:NewStats()
 	end
 
-	local procStats = ProcScienceStats.buffs[buffName]
+	local procStats = ProcScienceStats.procs[procID]
 	local link = self:GetItemLink(procInfo.itemID)
-	self:DetectProc(detected, procInfo, procStats, link, buffName, nil)
+	self:DetectProc(detected, procInfo, procStats, link, procID, nil)
 end
 
 function ProcScience:DetectBuffs()
 	local detected = {}
 
-	local buffIndex = 1
-	local icon = "someIcon"
-	local _, spellID
-	while icon do
-		icon, _, spellID = UnitBuff("player", buffIndex)
-		if icon then
-			self:DetectBuffProc(detected, buffIndex, spellID)
+	local buffIndex = 0
+	while buffIndex > -1 do
+		buffIndex = GetPlayerBuff(buffIndex, "HELPFUL")
+		if buffIndex > -1 then
+			self:DetectBuffProc(detected, buffIndex)
+			buffIndex = buffIndex + 1
 		end
-
-		buffIndex = buffIndex + 1
 	end
 
 	if self.log >= LOG_LEVEL.TRACKING then
@@ -415,6 +418,8 @@ function ProcScience:OnAddonLoaded()
 	self.trackedBuffs = {}
 	self.pendingAE = {}
 	self.log = ProcScienceStats.log or LOG_LEVEL.TRACKING
+	self.buffIDFunc = GetPlayerBuffID or function(buffIndex) end
+
 	self:PopulateSources()
 
 	self:Print("Loaded ("..SHORT_COMMIT_HASH..")")
@@ -615,32 +620,26 @@ end
 
 function ProcScience:PrintStats()
 	self:Print("Proc stats ("..SHORT_COMMIT_HASH.."):")
-	if not next(ProcScienceStats.items) and
-			not next(ProcScienceStats.enchants) and
-			not next(ProcScienceStats.tempEnchants) and
-			not next(ProcScienceStats.buffs) then
+	if not next(ProcScienceStats.procs) then
 		return self:Print("No data")
 	end
 
-	for _, procStats in ipairs( {ProcScienceStats.items, ProcScienceStats.enchants, ProcScienceStats.tempEnchants, ProcScienceStats.buffs}) do
-		for itemID, stats in pairs(procStats) do
-			if stats.hits > 0 then
-				local chance = stats.procs / stats.hits
-				local confidence = 1.96 * math.sqrt(chance * (1 - chance) / stats.hits)
-				local output = format("%s Hits: %d Procs: %d Chance: %.2f%% ±%.2f%%",
-						stats.itemLink, stats.hits, stats.procs, chance * 100, confidence * 100)
+	for procID, stats in pairs(ProcScienceStats.procs) do
+		if stats.hits > 0 then
+			local chance = stats.procs / stats.hits
+			local confidence = 1.96 * math.sqrt(chance * (1 - chance) / stats.hits)
+			local output = format("%s Hits: %d Procs: %d Chance: %.2f%% ±%.2f%%",
+					stats.itemLink, stats.hits, stats.procs, chance * 100, confidence * 100)
 
-				if stats.attackSpeed and stats.attackSpeed > 0 then
-					output = output..format(" PPM: %.3f ±%.3f",
-							chance * 60 / stats.attackSpeed, confidence * 60 / stats.attackSpeed)
-				end
-
-				self:Print(output)
-			else
-				self:Print(format("%s No hits", stats.itemLink))
+			if stats.attackSpeed and stats.attackSpeed > 0 then
+				output = output..format(" PPM: %.3f ±%.3f",
+						chance * 60 / stats.attackSpeed, confidence * 60 / stats.attackSpeed)
 			end
-		end
 
+			self:Print(output)
+		else
+			self:Print(format("%s No hits", stats.itemLink))
+		end
 	end
 end
 
@@ -673,29 +672,27 @@ end
 
 function ProcScience:ResetAll()
 	self:Print("Resetting all proc stats")
-	for _, procStats in ipairs( {ProcScienceStats.items, ProcScienceStats.enchants, ProcScienceStats.tempEnchants, ProcScienceStats.buffs}) do
-		for id, stats in pairs(procStats) do
-			stats.hits = 0
-			stats.procs = 0
-			stats.gcdHits = 0
-			stats.gcdProcs = 0
-		end
+	for procID, stats in pairs(ProcScienceStats.procs) do
+		stats.hits = 0
+		stats.procs = 0
+		stats.gcdHits = 0
+		stats.gcdProcs = 0
 	end
 end
 
 function ProcScience:ResetTracked()
 	self:Print("Resetting currently tracked proc stats")
 	-- TODO fix this resetting
-	for spellName, proc in pairs(self.tracked) do
-		local stats = ProcScienceStats.items[proc.itemID]
+	for spellIdOrName, proc in pairs(self.tracked) do
+		local stats = ProcScienceStats.procs[proc.procID]
 		stats.hits = 0
 		stats.procs = 0
 		stats.gcdHits = 0
 		stats.gcdProcs = 0
 	end
 
-	for spellName, proc in pairs(self.trackedBuffs) do
-		local stats = ProcScienceStats.buffs[proc.itemID]
+	for spellIdOrName, proc in pairs(self.trackedBuffs) do
+		local stats = ProcScienceStats.procs[proc.procID]
 		stats.hits = 0
 		stats.procs = 0
 		stats.gcdHits = 0
@@ -706,7 +703,7 @@ end
 function ProcScience:Reset(item)
 	local itemID = GetItemInfoInstant(item)
 	if itemID ~= nil then
-		local stats = ProcScienceStats.items[itemID]
+		local stats = ProcScienceStats.procs[itemID]
 		if stats ~= nil then
 			self:Print("Resetting proc stats for "..stats.itemLink)
 			stats.hits = 0
@@ -740,9 +737,8 @@ function ProcScience:OnEvent()
 		return ProcScience:DetectItems()
 	end
 
-	if event == "UNIT_AURA" and arg1 == "player" then
-		return ProcScience:Print(string.format("%s %s %s %s", event, tostring(arg1), tostring(arg2), tostring(arg3)))
-		--return ProcScience:DetectBuffs()
+	if event == "PLAYER_AURAS_CHANGED" then
+		return ProcScience:DetectBuffs()
 	end
 
 	if event == "CHAT_MSG_COMBAT_SELF_HITS" or
@@ -792,7 +788,7 @@ function ProcScience:RegisterEvents()
 	-- track "You gain Holy Strength" crusader strength buff
 
 	self:RegisterEvent("UNIT_AURA")
-	self:RegisterEvent("UNIT_AURASTATE")
+	self:RegisterEvent("PLAYER_AURAS_CHANGED")
 
 	if self.superWowActive then
 		self:RegisterEvent("UNIT_CASTEVENT")
