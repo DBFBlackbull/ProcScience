@@ -118,22 +118,13 @@ function ProcScience:GetItemTempEnchantProc(slotID)
 	end
 end
 
-function ProcScience:GetItemIDFromLink(itemLink)
-	local foundID, _ , itemID = string.find(itemLink, "item:(%d+)")
+function ProcScience:GetItemIDsFromLink(itemLink)
+	local foundID, _ , itemID, itemEnchantID = string.find(itemLink, "item:(%d+):(%d+)")
 	if not foundID then
 		return
 	end
 
-	return tonumber(itemID)
-end
-
-function ProcScience:GetItemEnchantIDFromLink(itemLink)
-	local foundID, _ , itemEnchantID = string.find(itemLink, "item:%d+:(%d+)")
-	if not foundID then
-		return
-	end
-
-	return tonumber(itemEnchantID)
+	return tonumber(itemID), tonumber(itemEnchantID)
 end
 
 function ProcScience:GetItemLink(itemID)
@@ -200,7 +191,7 @@ end
 
 
 function ProcScience:DetectEnchantProc(detected, itemLink, slotID)
-	local itemEnchantID = self:GetItemEnchantIDFromLink(itemLink)
+	local _, itemEnchantID = self:GetItemIDsFromLink(itemLink)
 	local procInfo = L.Enchants[itemEnchantID]
 	if not procInfo then
 		return
@@ -216,7 +207,7 @@ function ProcScience:DetectEnchantProc(detected, itemLink, slotID)
 end
 
 function ProcScience:DetectItemProc(detected, itemLink, slotID)
-	local itemID = self:GetItemIDFromLink(itemLink)
+	local itemID = self:GetItemIDsFromLink(itemLink)
 	local procInfo = L.Procs[itemID]
 	if not procInfo then
 		return
