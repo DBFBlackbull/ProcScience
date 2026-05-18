@@ -400,16 +400,14 @@ function ProcScience:OnAddonLoaded()
 	end
 
 	local _, unitClass = UnitClass("player")
-	local _, guid = UnitExists("player") -- superwow
-	local _, targetGuid = UnitExists("target") -- superwow
 	self.player = {
 		name = UnitName("player"),
-		guid = guid,
-		level = UnitLevel("player"), -- fluff. Never used
+		guid = nil,
+		level = 0, -- fluff. Never used
 		class = unitClass,
 		disarmed = false,
 		targetName = UnitName("target"),
-		targetGuid = targetGuid,
+		targetGuid = nil,
 	}
 
 	self.tracked = {}
@@ -439,6 +437,13 @@ function ProcScience:SetGlobalCooldownSpellSlot()
 			return
 		end
 	end
+end
+
+function ProcScience:OnPlayerEnteringWorld()
+	local _, guid = UnitExists("player") -- superwow
+	self.player.guid = guid
+	self.player.level = UnitLevel("player")
+	self:SetGlobalCooldownSpellSlot()
 end
 
 function ProcScience:OnTargetChanged()
@@ -729,7 +734,7 @@ function ProcScience:OnEvent()
 	end
 
 	if event == "PLAYER_ENTERING_WORLD" then
-		ProcScience:SetGlobalCooldownSpellSlot()
+		ProcScience:OnPlayerEnteringWorld()
 		return ProcScience:DetectItems()
 	end
 
