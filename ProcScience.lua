@@ -27,8 +27,6 @@ local function IsMeleeWeaponSlot(slotID)
 	return slotID == INVSLOT_MAIN_HAND or slotID == INVSLOT_OFF_HAND
 end
 
-ProcScienceStats = ProcScienceStats or { version = VERSION, log = LOG_LEVEL.TRACKING, procs = {} }
-
 function ProcScience:NewStats()
 	return { hits = 0, phantomHits = 0, procs = 0, gcdHits = 0, gcdProcs = 0 }
 end
@@ -417,8 +415,10 @@ function ProcScience:OnAddonLoaded()
 	self.tracked = {}
 	self.trackedBuffs = {}
 	self.pendingAE = {}
-	self.log = ProcScienceStats.log or LOG_LEVEL.TRACKING
 	self.buffIDFunc = GetPlayerBuffID or function(buffIndex) end
+
+	ProcScienceStats = ProcScienceStats or { version = VERSION, log = LOG_LEVEL.TRACKING, procs = {} }
+	self.log = ProcScienceStats.log or LOG_LEVEL.TRACKING
 
 	self:PopulateSources()
 
