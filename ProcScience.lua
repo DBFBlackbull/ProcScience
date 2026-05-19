@@ -413,6 +413,7 @@ function ProcScience:OnAddonLoaded()
 		disarmed = false,
 		targetName = nil,
 		targetGuid = nil,
+		isOffhand = false
 	}
 
 	self.tracked = {}
@@ -525,6 +526,11 @@ function ProcScience:OnUnitCastEvent(timestamp)
 		return
 	end
 
+	if spellID == 6603 then
+		self.player.isOffhand = eventType == "OFFHAND"
+		return
+	end
+
 	if eventType ~= "CAST" and eventType ~= "CHANNEL" then
 		return
 	end
@@ -539,7 +545,7 @@ function ProcScience:OnCombatLogEvent(timestamp)
 
 	-- Tracks auto attacks
 	if event == "CHAT_MSG_COMBAT_SELF_HITS" then
-		return self:UpdateProcHits("Melee", false)
+		return self:UpdateProcHits("Melee", self.player.isOffhand)
 	end
 
 	if event == "CHAT_MSG_SPELL_SELF_DAMAGE" then
@@ -548,7 +554,7 @@ function ProcScience:OnCombatLogEvent(timestamp)
 		local spellName = spellHit or spellCrit
 		local unit = unitHit or unitCrit
 		if self.sources.Damage[spellName] then
-			return self:UpdateProcHits(spellName)
+			return self:UpdateProcHits(spellName, false)
 		end
 
 		-- handle phantom hits
@@ -570,9 +576,10 @@ function ProcScience:OnCombatLogEvent(timestamp)
 		if not unit and not spellName then
 			_, _, unit, spellName = string.find(arg1, "(.+) is afflicted by (.+)%.")
 		end
+
 		-- Track instant attack spells
-		if self.sources.Damage[spellName] then
-			return self:UpdateProcHits(spellName)
+		if self.sources.Aura[spellName] then
+			return self:UpdateProcHits(spellName, false)
 		end
 
 		-- NEEDS TESTING
