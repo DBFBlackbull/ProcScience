@@ -266,7 +266,14 @@ function ProcScience:GetBuffName(buffIndex)
 	return line:GetText()
 end
 
-function ProcScience:GetBuffProcByName(buffName)
+function ProcScience:GetBuffProc(buffIndex)
+	local buffID = GetPlayerBuffID and GetPlayerBuffID(buffIndex)
+	local procInfo = L.Buffs[buffID]
+	if procInfo then
+		return buffID, procInfo
+	end
+
+	local buffName = self:GetBuffName(buffIndex)
 	for buffID, procInfo in pairs(L.Buffs) do
 		if procInfo.buffName == buffName then
 			return buffID, procInfo
@@ -275,13 +282,9 @@ function ProcScience:GetBuffProcByName(buffName)
 end
 
 function ProcScience:DetectBuffProc(detected, buffIndex)
-	local buffID = self.buffIDFunc(buffIndex)
-	local procInfo = buffID and L.Buffs[buffID]
+	local buffID, procInfo = self:GetBuffProc(buffIndex)
 	if not procInfo then
-		buffID, procInfo = self:GetBuffProcByName(self:GetBuffName(buffIndex))
-		if not procInfo then
-			return
-		end
+		return
 	end
 
 	local procID = "buff:"..buffID
@@ -419,7 +422,6 @@ function ProcScience:OnAddonLoaded()
 	self.tracked = {}
 	self.trackedBuffs = {}
 	self.pendingAE = {}
-	self.buffIDFunc = GetPlayerBuffID or function(buffIndex) end
 
 	ProcScienceStats = ProcScienceStats or { version = VERSION, log = LOG_LEVEL.TRACKING, procs = {} }
 	self.log = ProcScienceStats.log or LOG_LEVEL.TRACKING
