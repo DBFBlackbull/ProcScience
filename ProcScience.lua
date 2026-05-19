@@ -28,7 +28,7 @@ local function IsMeleeWeaponSlot(slotID)
 end
 
 function ProcScience:NewStats()
-	return { hits = 0, phantomHits = 0, procs = 0, gcdHits = 0, gcdProcs = 0 }
+	return { hits = 0, phantomHits = 0, procs = 0, gcdProc = false }
 end
 
 function ProcScience:ResetStats(stats)
@@ -39,8 +39,7 @@ function ProcScience:ResetStats(stats)
 	stats.hits = 0
 	stats.phantomHits = 0
 	stats.procs = 0
-	stats.gcdHits = 0
-	stats.gcdProcs = 0
+	stats.gcdProc = false
 end
 
 local function dump(o)
@@ -332,16 +331,12 @@ end
 function ProcScience:UpdateProcHits(source, isOffHand, amount)
 	isOffHand = isOffHand or false
 	amount = amount or 1
-	local isGCD = self:IsGCD()
 	for _, tracked in ipairs({self.tracked, self.trackedBuffs}) do
 		for spellName, proc in pairs(tracked) do
 			if proc.filter == nil or (proc.filter == "main hand" and not isOffHand and not self.player.disarmed) or (proc.filter == "off-hand" and isOffHand) then
 				local trigger = proc.info.events.trigger
 				if trigger == L.TRIGGER_ON_HIT or not self.sources.AreaEffect[source] or self.pendingAE[source] then
 					proc.stats.hits = proc.stats.hits + amount
-					if isGCD then
-						proc.stats.gcdHits = proc.stats.gcdHits + amount
-					end
 				end
 			end
 		end
@@ -373,7 +368,6 @@ function ProcScience:CheckProcEvent(timestamp, event, unit, spellName, spellID)
 	local procOnSelf = events.target == L.TARGET_SELF and (unit == self.player.name or unit == self.player.guid)
 	local procOnTarget = events.target == L.TARGET_ENEMY and (unit == self.player.target or unit == self.player.targetGuid)
 	if procOnSelf or procOnTarget then
-		local isGCD = self:IsGCD()
 		local procMessage = proc.stats.itemLink.." proced "..proc.stats.spellName
 
 		if self.log == LOG_LEVEL.SELF then
@@ -391,8 +385,8 @@ function ProcScience:CheckProcEvent(timestamp, event, unit, spellName, spellID)
 		end
 		proc.stats.procs = proc.stats.procs + 1
 		proc.timestamp = timestamp
-		if isGCD then
-			proc.stats.gcdProcs = proc.stats.gcdProcs + 1
+		if self:IsGCD() then
+			proc.stats.gcdProc = true
 		end
 		return
 	end
