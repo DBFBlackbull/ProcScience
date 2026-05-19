@@ -31,6 +31,18 @@ function ProcScience:NewStats()
 	return { hits = 0, phantomHits = 0, procs = 0, gcdHits = 0, gcdProcs = 0 }
 end
 
+function ProcScience:ResetStats(stats)
+	if not stats then
+		return
+	end
+
+	stats.hits = 0
+	stats.phantomHits = 0
+	stats.procs = 0
+	stats.gcdHits = 0
+	stats.gcdProcs = 0
+end
+
 local function dump(o)
 	if type(o) == 'table' then
 		local s = '{ '
@@ -678,31 +690,22 @@ end
 
 function ProcScience:ResetAll()
 	self:Print("Resetting all proc stats")
-	for procID, stats in pairs(ProcScienceStats.procs) do
-		stats.hits = 0
-		stats.procs = 0
-		stats.gcdHits = 0
-		stats.gcdProcs = 0
+	for _, stats in pairs(ProcScienceStats.procs) do
+		self:ResetStats(stats)
 	end
 end
 
 function ProcScience:ResetTracked()
 	self:Print("Resetting currently tracked proc stats")
 	-- TODO fix this resetting
-	for spellIdOrName, proc in pairs(self.tracked) do
+	for _, proc in pairs(self.tracked) do
 		local stats = ProcScienceStats.procs[proc.procID]
-		stats.hits = 0
-		stats.procs = 0
-		stats.gcdHits = 0
-		stats.gcdProcs = 0
+		self:ResetStats(stats)
 	end
 
-	for spellIdOrName, proc in pairs(self.trackedBuffs) do
+	for _, proc in pairs(self.trackedBuffs) do
 		local stats = ProcScienceStats.procs[proc.procID]
-		stats.hits = 0
-		stats.procs = 0
-		stats.gcdHits = 0
-		stats.gcdProcs = 0
+		self:ResetStats(stats)
 	end
 end
 
