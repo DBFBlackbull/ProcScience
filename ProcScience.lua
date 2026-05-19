@@ -399,14 +399,13 @@ function ProcScience:OnAddonLoaded()
 		self.superWowActive = false
 	end
 
-	local _, unitClass = UnitClass("player")
 	self.player = {
-		name = UnitName("player"),
+		name = nil,
 		guid = nil,
 		level = 0, -- fluff. Never used
-		class = unitClass,
+		class = nil,
 		disarmed = false,
-		targetName = UnitName("target"),
+		targetName = nil,
 		targetGuid = nil,
 	}
 
@@ -417,8 +416,6 @@ function ProcScience:OnAddonLoaded()
 
 	ProcScienceStats = ProcScienceStats or { version = VERSION, log = LOG_LEVEL.TRACKING, procs = {} }
 	self.log = ProcScienceStats.log or LOG_LEVEL.TRACKING
-
-	self:PopulateSources()
 
 	self:Print("Loaded ("..SHORT_COMMIT_HASH..")")
 
@@ -441,8 +438,12 @@ end
 
 function ProcScience:OnPlayerEnteringWorld()
 	local _, guid = UnitExists("player") -- superwow
+	local _, unitClass = UnitClass("player")
+	self.player.name = UnitName("player")
 	self.player.guid = guid
+	self.player.class = unitClass
 	self.player.level = UnitLevel("player")
+	self:PopulateSources()
 	self:SetGlobalCooldownSpellSlot()
 end
 
