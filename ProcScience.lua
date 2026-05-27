@@ -332,6 +332,10 @@ function ProcScience:IsGCD()
 end
 
 function ProcScience:UpdateProcHits(source, isOffHand, isPhantomStrike, amount)
+	if self.log == LOG_LEVEL.DEBUG then
+		self:Print(string.format("%s %s %s %s", event, source, tostring(isOffHand), tostring(isPhantomStrike)))
+	end
+
 	isOffHand = isOffHand or false
 	amount = amount or 1
 	for _, tracked in ipairs({self.tracked, self.trackedBuffs}) do
@@ -518,14 +522,14 @@ function ProcScience:OnUnitCastEvent(timestamp)
 	local spellName = SpellInfo(spellID)
 
 	-- filter out auto attack spells
-	if self.log == LOG_LEVEL.DEBUG and spellID ~= 6603 then
+	if self.log == LOG_LEVEL.DEBUG then
 		local target = ""
 		if targetGuid == self.player.guid then
 			target = "self"
 		elseif targetGuid == self.player.targetGuid then
 			target = "target"
 		end
-		self:Print(string.format("%s %s %s %s unit == %s", event, spellID, spellName, targetGuid, target))
+		self:Print(string.format("%s %s %s %s %s unit == %s", event, spellID, spellName, eventType, targetGuid, target))
 		--self:Print(format("caster: %s target: %s eventType: %s spell: %s (%s) castDuration: %s", casterGuid, targetGuid, eventType, spellName, spellID, castDuration))
 	end
 
@@ -664,10 +668,10 @@ function ProcScience:PrintStats(isVerbose)
 
 	for procID, stats in pairs(ProcScienceStats.procs) do
 		if stats.hits > 0 then
-			self:Print(self:CalculateProcChance(stats, "Hits", stats.hits + stats.phantomHits))
+			self:Print(self:CalculateProcChance(stats, stats.hits + stats.phantomHits, "Hits"))
 			if isVerbose then
-				self:Print(self:CalculateProcChance(stats, "True hits", stats.hits))
-				self:Print(self:CalculateProcChance(stats, "Phantom hits", stats.phantomHits))
+				self:Print(self:CalculateProcChance(stats, stats.hits, "True hits"))
+				self:Print(self:CalculateProcChance(stats, stats.phantomHits, "Phantom hits"))
 			end
 		else
 			return 	self:Print(string.format("%s No hits", stats.itemLink))
