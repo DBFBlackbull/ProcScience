@@ -338,16 +338,27 @@ function ProcScience:UpdateProcHits(source, isOffHand, isPhantomStrike, amount)
 
 	isOffHand = isOffHand or false
 	amount = amount or 1
-	for _, tracked in ipairs({self.tracked, self.trackedBuffs}) do
-		for spellName, proc in pairs(tracked) do
-			if proc.filter == nil or (proc.filter == "main hand" and not isOffHand and not self.player.disarmed) or (proc.filter == "off-hand" and isOffHand) then
-				local trigger = proc.info.events.trigger
-				if trigger == L.TRIGGER_ON_HIT or not self.sources.AreaEffect[source] or self.pendingAE[source] then
-					if isPhantomStrike then
-						proc.stats.phantomHits = proc.stats.phantomHits + 1
-					else
-						proc.stats.hits = proc.stats.hits + amount
-					end
+	for spellName, proc in pairs(self.tracked) do
+		if proc.filter == nil or (proc.filter == "main hand" and not isOffHand and not self.player.disarmed) or (proc.filter == "off-hand" and isOffHand) then
+			local trigger = proc.info.events.trigger
+			if trigger == L.TRIGGER_ON_HIT or not self.sources.AreaEffect[source] or self.pendingAE[source] then
+				if isPhantomStrike then
+					proc.stats.phantomHits = proc.stats.phantomHits + 1
+				else
+					proc.stats.hits = proc.stats.hits + amount
+				end
+			end
+		end
+	end
+
+	for spellName, proc in pairs(self.trackedBuffs) do
+		if proc.filter == nil or (proc.filter == "main hand" and not isOffHand and not self.player.disarmed) or (proc.filter == "off-hand" and isOffHand) then
+			local trigger = proc.info.events.trigger
+			if trigger == L.TRIGGER_ON_HIT or not self.sources.AreaEffect[source] or self.pendingAE[source] then
+				if isPhantomStrike then
+					proc.stats.phantomHits = proc.stats.phantomHits + 1
+				else
+					proc.stats.hits = proc.stats.hits + amount
 				end
 			end
 		end
@@ -672,9 +683,10 @@ function ProcScience:PrintStats(isVerbose)
 			if isVerbose then
 				self:Print(self:CalculateProcChance(stats, stats.hits, "True hits"))
 				self:Print(self:CalculateProcChance(stats, stats.phantomHits, "Phantom hits"))
+				self:Print("")
 			end
 		else
-			return 	self:Print(string.format("%s No hits", stats.itemLink))
+			self:Print(string.format("%s No hits", stats.itemLink))
 		end
 	end
 end
