@@ -331,7 +331,7 @@ function ProcScience:IsGCD()
 	return duration == 1.5
 end
 
-function ProcScience:UpdateProcHits(source, isOffHand, amount)
+function ProcScience:UpdateProcHits(source, isOffHand, isPhantomStrike, amount)
 	isOffHand = isOffHand or false
 	amount = amount or 1
 	for _, tracked in ipairs({self.tracked, self.trackedBuffs}) do
@@ -339,7 +339,11 @@ function ProcScience:UpdateProcHits(source, isOffHand, amount)
 			if proc.filter == nil or (proc.filter == "main hand" and not isOffHand and not self.player.disarmed) or (proc.filter == "off-hand" and isOffHand) then
 				local trigger = proc.info.events.trigger
 				if trigger == L.TRIGGER_ON_HIT or not self.sources.AreaEffect[source] or self.pendingAE[source] then
-					proc.stats.hits = proc.stats.hits + amount
+					if isPhantomStrike then
+						proc.stats.phantomHits = proc.stats.phantomHits + 1
+					else
+						proc.stats.hits = proc.stats.hits + amount
+					end
 				end
 			end
 		end
@@ -391,7 +395,8 @@ function ProcScience:CheckProcEvent(timestamp, event, unit, spellName, spellID)
 		if self:IsGCD() then
 			proc.stats.gcdProc = true
 		end
-		return
+
+		return proc
 	end
 
 	--if (destGUID == self.player.guid or target ~= L.TARGET_SELF) and
@@ -559,8 +564,6 @@ function ProcScience:OnCombatLogEvent(timestamp)
 			return self:UpdateProcHits(spellName, false)
 		end
 
-		-- handle phantom hits
-
 		local _, _, spellMiss, unitMiss = string.find(arg1, "Your (.+) missed (.+)%.")
 		local _, _, spellDodge, unitDodge = string.find(arg1, "Your (.+) was dodged by (.+)%.")
 		local _, _, spellParry, unitParry = string.find(arg1, "Your (.+) is parried by (.+)%.")
@@ -639,7 +642,21 @@ function ProcScience:OnLossOfControlEvent()
 	end
 end
 
-function ProcScience:PrintStats()
+function ProcScience:CalculateProcChance(stats, hits, label)
+	local chance = stats.procs / hits
+	local confidence = 1.96 * math.sqrt(chance * (1 - chance) / hits)
+	local output = string.format("%s %s: %d Procs: %d Chance: %.2f%% ±%.2f%%",
+			stats.itemLink, label, hits, stats.procs, chance * 100, confidence * 100)
+
+	if stats.attackSpeed and stats.attackSpeed > 0 then
+		output = output..string.format(" PPM: %.3f ±%.3f",
+				chance * 60 / stats.attackSpeed, confidence * 60 / stats.attackSpeed)
+	end
+
+	return output
+end
+
+function ProcScience:PrintStats(isVerbose)
 	self:Print("Proc stats ("..SHORT_COMMIT_HASH.."):")
 	if not next(ProcScienceStats.procs) then
 		return self:Print("No data")
@@ -647,19 +664,13 @@ function ProcScience:PrintStats()
 
 	for procID, stats in pairs(ProcScienceStats.procs) do
 		if stats.hits > 0 then
-			local chance = stats.procs / stats.hits
-			local confidence = 1.96 * math.sqrt(chance * (1 - chance) / stats.hits)
-			local output = format("%s Hits: %d Procs: %d Chance: %.2f%% ±%.2f%%",
-					stats.itemLink, stats.hits, stats.procs, chance * 100, confidence * 100)
-
-			if stats.attackSpeed and stats.attackSpeed > 0 then
-				output = output..format(" PPM: %.3f ±%.3f",
-						chance * 60 / stats.attackSpeed, confidence * 60 / stats.attackSpeed)
+			self:Print(self:CalculateProcChance(stats, "Hits", stats.hits + stats.phantomHits))
+			if isVerbose then
+				self:Print(self:CalculateProcChance(stats, "True hits", stats.hits))
+				self:Print(self:CalculateProcChance(stats, "Phantom hits", stats.phantomHits))
 			end
-
-			self:Print(output)
 		else
-			self:Print(format("%s No hits", stats.itemLink))
+			return 	self:Print(string.format("%s No hits", stats.itemLink))
 		end
 	end
 end
@@ -822,6 +833,8 @@ SlashCmdList["PROCS"] = function(msg)
 		ProcScience:ResetTracked()
 	elseif msg == "debug" then
 		ProcScience:Dump()
+	elseif msg == "verbose" then
+		ProcScience:PrintStats(true)
 	elseif msg == "" then
 		ProcScience:PrintStats()
 	elseif string.find(msg, "log (.+)") then

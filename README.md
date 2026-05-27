@@ -22,7 +22,25 @@ Your statistics are saved between game sessions per character, so you can log ou
 
  - The 1.12.1 client is limited in the information given in the combat log which causes this version to be less rigours than the 1.14 counterpart.
  - This addon only works for the English client. No work have gone into localization.
- - The addon only tracks a handful of manually added items, so if your item of interest is not being tracked, please either modify the `Procs.lua` file or create an issue on github.
+ - The addon tracks the vast majority of weapons, enchants, temporary enchants that have a Chance on hit proc, as well as some trinkets and buffs that also proc with a chance on hit
+ - The addon records some Phantom strikes and includes calculations both for regular hits and phantom hits
+
+## Functionality table
+
+- :white_check_mark: = Fully functional and accurate
+- :warning: = Functional but inaccurate. Requires controlled environment for testing
+- :x: = Not functional, do not use for testing
+
+| Feature                        | Example Item                                                                                                                                                                                                                                                                       | 1.12.1 Native      | 1.12.1 SuperWoW    |
+|--------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------|--------------------|
+| Main hand vs Off-hand tracking | N/A                                                                                                                                                                                                                                                                                | :x:                | :white_check_mark: |
+| Extra attacks                  | [[Hand of Justice]](https://www.wowhead.com/classic/item=11815/hand-of-justice)<br>[[Ironfoe]](https://www.wowhead.com/classic/item=11684/ironfoe)<br>[[Thrash Blade]](https://www.wowhead.com/classic/item=17705/thrash-blade)                                                    | :white_check_mark: | :white_check_mark: |
+| Direct damage                  | [[Sulfuras, Hand of Ragnaros]](https://www.wowhead.com/classic/item=17182/sulfuras-hand-of-ragnaros)<br>[[Drake Talon Cleaver]](https://www.wowhead.com/classic/item=19353/drake-talon-cleaver)<br>[[Coldrage Dagger]](https://www.wowhead.com/classic/item=10761/coldrage-dagger) | :warning:          | :white_check_mark: |
+| Direct healing/mana            | [[Arcanite Champion]](https://www.wowhead.com/classic/spell=16916/strength-of-the-champion)<br>[[Darkmoon Card: Heroism]](https://www.wowhead.com/classic/item=19287/darkmoon-card-heroism)<br>[[Fist of Stone]](https://www.wowhead.com/classic/item=17943/fist-of-stone)         | :warning:          | :white_check_mark: |
+| Self buff                      | [[Destiny]](https://www.wowhead.com/classic/item=647/destiny)<br>[[Bonereaver's Edge]](https://www.wowhead.com/classic/item=17076/bonereavers-edge)<br>[[Truesilver Champion]](https://www.wowhead.com/classic/item=7960/truesilver-champion)                                      | :warning:          | :white_check_mark: |
+| Target debuff                  | [[Nightfall]](https://www.wowhead.com/classic/item=19169/nightfall)<br>[[Annihilator]](https://www.wowhead.com/classic/item=12798/annihilator)<br>[[Bashguuder]](https://www.wowhead.com/classic/item=13204/bashguuder)                                                            | :warning:          | :white_check_mark: |
+
+
 
 ## Errors and uncertainty
 
@@ -49,7 +67,7 @@ These procs contains the wording "You gain X extra attack" and can be detected w
 
 ### Items that proc direct damage are likely safe.
 
-These inclide:
+These include:
  - [[Sulfuras, Hand of Ragnaros]](https://www.wowhead.com/classic/item=17182/sulfuras-hand-of-ragnaros)
  - [[Drake Talon Cleaver]](https://www.wowhead.com/classic/item=19353/drake-talon-cleaver)
  - [[Coldrage Dagger]](https://www.wowhead.com/classic/item=10761/coldrage-dagger)
@@ -59,10 +77,25 @@ These procs contains the wordings:
  - `Your Frostbolt crits Winterfall Den Watcher for 400 Frost damage.`
  - `Your Fatal Wound is parried by Winterfall Den Watcher.`
 
-The procs always come from you, so other players cannot interfer.
-The procs rely on the spell name which is not unique, so if a Mage equips a [[Coldrage Dagger]](https://www.wowhead.com/classic/item=10761/coldrage-dagger) and casts Frostbolt, then every cast will be considered as a proc.
+The procs always come from you, so other players cannot interfere.
+The procs rely on the spell name which is not unique, so if you are a Mage and equips a [[Coldrage Dagger]](https://www.wowhead.com/classic/item=10761/coldrage-dagger) and casts Frostbolt, then every cast will be considered as a proc.
 
-### Items that proc a buff are somewhat reliable:
+### Items that proc direct healing / mana on you.
+
+These include:
+- [[Arcanite Champion]](https://www.wowhead.com/classic/spell=16916/strength-of-the-champion)
+- [[Darkmoon Card: Heroism]](https://www.wowhead.com/classic/item=19287/darkmoon-card-heroism)
+- [[Fist of Stone]](https://www.wowhead.com/classic/item=17943/fist-of-stone)
+
+These procs contains the wordings:
+- `Your Strength of the Champion heals you for 270`
+- `Your Heroism heals you for 120`
+- `You gain 50 Mana from Fist of Stone.`
+
+The procs always come from you, so other players cannot interfere.
+The procs rely on the spell name which is not unique, so if you can cast a spell with the same name as the procced spell then it will be recorede as a proc.
+
+### Items that proc a buff are somewhat reliable.
 
 These include:
  - [[Destiny]](https://www.wowhead.com/classic/item=647/destiny)
@@ -94,7 +127,7 @@ Since the combat log event for these items are of the format:
  - `Winterfall Den Watcher is afflicted by Armor Shatter (2).`
  - `Winterfall Den Watcher is afflicted by Puncture Armor (3).`
 
-These events cannot be reliable determined to come from the player character or from the characters weapon.
+These events cannot be reliable determined to come from the player character or from the character's weapon.
  - If multiple people are testing [[Nightfall]](https://www.wowhead.com/classic/item=19169/nightfall) against mobs of the same name, then a proc of [Spell Vulnerability](https://www.wowhead.com/classic/spell=23605/spell-vulnerability) for one character will count as every player's Nightfall just procced. In a raid with multiple Nightfall's this can easily occur.
 
 Therefore, it is best to test these weapons in a safe environment alone, away from other players.
@@ -113,22 +146,22 @@ SuperWoW introduces a new event `UNIT_CASTEVENT` that fires every time a spell o
  - The caster GUID
  - The target GUID
  - The spellID
+ - If an auto attack is main hand or off-hand
 
 Some of the edge cases above that are handled
  - The spellID ensures that no spell name duplication triggers false positives. For instance: [[Coldrage Dagger]](https://www.wowhead.com/classic/item=10761/coldrage-dagger)'s [[Frostbolt]](https://www.wowhead.com/classic/spell=13439/frostbolt) has a different spellID from a mages [[Frostbolt]](https://www.wowhead.com/classic/spell=25304/frostbolt)
  - Buff refreshes are now tracked because `UNIT_CASTEVENT` is always fired, even when an existing buffs is still active
- - Debuff refhreses are now tracked because `UNIT_CASTEVENT` is always fired, even when an existing debuff is still active.
+ - Debuff refreshes are now tracked because `UNIT_CASTEVENT` is always fired, even when an existing debuff is still active.
 
 ### SuperWoW exceptions
 
-Even though SupwerWoW has some information about Main hand and Off-hand attacks, this information is not enough to determine which hand procced an effect. Therefore, all testing should still be done with only 1 weapon equipped in the main hand.
+Even though SupwerWoW has some information about Main hand and Off-hand attacks, this information is not enough to determine which hand procced an effect. Therefore, all testing should still be done with a unique weapon in each hand. So no not dual wield 2x [[Coldrage Dagger]](https://www.wowhead.com/classic/item=10761/coldrage-dagger)
 
-3 buffs have been found that triggers without any `UNIT_CASTEVENT` firing, which excepts them from the SuperWoW improvements. These are:
- - [[Nightfall]](https://www.wowhead.com/classic/item=19169/nightfall) proccing [Spell Vulnerability](https://www.wowhead.com/classic/spell=23605/spell-vulnerability)
+2 buffs have been found that triggers without any `UNIT_CASTEVENT` firing, which excepts them from the SuperWoW improvements. These are:
+ - [[Nightfall]](https://www.wowhead.com/classic/item=19169/nightfall) proccing [[Spell Vulnerability]](https://www.wowhead.com/classic/spell=23605/spell-vulnerability)
  - [[Annihilator]](https://www.wowhead.com/classic/item=12798/annihilator) proccing [[Armor Shatter]](https://www.wowhead.com/classic/spell=16928/armor-shatter)
- - [[Dark Iron Sunderer]](https://www.wowhead.com/classic/item=11607/dark-iron-sunderer) proccing [[Cleave Armor]](https://www.wowhead.com/classic/spell=15280/cleave-armor)
 
-Ironicly these 3 debuffs have the highest viability in raids and are therefore most tested while being in the most unreliable group. These would have benefited the most from being made secure by SupwerWoW.
+Ironically these 2 debuffs have the highest viability in raids and are therefore most tested while being in the most unreliable group. These would have benefited the most from being made secure by SupwerWoW.
 
 # ProcScience from Classic WoW Armaments
 
