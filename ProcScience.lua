@@ -27,8 +27,8 @@ local function IsMeleeWeaponSlot(slotID)
 	return slotID == INVSLOT_MAIN_HAND or slotID == INVSLOT_OFF_HAND
 end
 
-function ProcScience:NewStats()
-	return { hits = 0, phantomHits = 0, procs = 0, gcdProc = false }
+function ProcScience:NewStats(attackSpeed)
+	return { hits = 0, phantomHits = 0, procs = 0, gcdProc = false, attackSpeed = attackSpeed }
 end
 
 function ProcScience:ResetStats(stats)
@@ -94,36 +94,102 @@ local ProcScience_Prefix = "ProcScienceTooltip"
 local ProcScience_Tooltip = getglobal(ProcScience_Prefix) or CreateFrame("GameTooltip", ProcScience_Prefix, nil, "GameTooltipTemplate")
 ProcScience_Tooltip:SetOwner(WorldFrame, "ANCHOR_NONE")
 
-function ProcScience:GetAttackSpeed(slotID)
-	ProcScience_Tooltip:ClearLines()
-	ProcScience_Tooltip:SetInventoryItem("player", slotID)
-	for i = 1, ProcScience_Tooltip:NumLines() do
-		local line = getglobal(ProcScience_Prefix.."TextRight"..i)
-		local text = line:GetText()
-		if text then
-			local _, _, speed = string.find(text, "Speed (%d%.%d%d)")
+function ProcScience:GetItemTempEnchantFunc(itemInfo, slotID)
+	local itemTempEnchantIDFunc = function(leftText) return end
+	if IsMeleeWeaponSlot(slotID) then
+		local hasMainHandEnchant, _, _, hasOffHandEnchant = GetWeaponEnchantInfo()
+		local hasTempEnchant = slotID == INVSLOT_MAIN_HAND and hasMainHandEnchant or
+				slotID == INVSLOT_OFF_HAND and hasOffHandEnchant
+		if hasTempEnchant then
+			itemTempEnchantIDFunc = function(leftText)
+				for itemTempEnchantID, procInfo in pairs(L.TemporaryEnchants) do
+					local pattern = "^".. procInfo.enchantName .. " %(%d+ (%a%a%a)%)$"
+					if string.find(leftText, pattern) then
+						itemInfo.itemTempEnchantID = itemTempEnchantID
+					end
+				end
+			end
+		end
+	end
+
+	return itemTempEnchantIDFunc
+end
+
+function ProcScience:GetWeaponSpeedFunc(itemInfo, slotID)
+	local getWeaponSpeedFunc = function(rightText) return end
+	if IsWeaponSlot(slotID) then
+		getWeaponSpeedFunc = function(rightText)
+			local _, _, speed = string.find(rightText, "Speed (%d%.%d%d)")
 			if speed then
-				return tonumber(speed)
+				itemInfo.speed = tonumber(speed)
+			end
+		end
+	end
+
+	return getWeaponSpeedFunc
+end
+
+function ProcScience:DetectSetBonusProcs(setBonus, leftText, itemInfo)
+	-- Set names are listed before bonuses
+	local _,_, setName = string.find(leftText, "(.+) %(%d/%d%)")
+	if setName then
+		itemInfo.setName = setName
+		return
+	end
+
+	for setBonusID, procInfo in pairs(L.SetBonus) do
+		if string.find(leftText, "^Set: " .. procInfo.description) then
+			if not setBonus[setBonusID] then
+				setBonus[setBonusID] = {
+					setName = itemInfo.setName or procInfo.setName,
+					quality = 0,
+					hex = nil,
+				}
+			end
+
+			if setBonus[setBonusID].quality < itemInfo.itemQuality then
+				setBonus[setBonusID].quality = itemInfo.itemQuality
+				setBonus[setBonusID].hex = itemInfo.itemColorHex
 			end
 		end
 	end
 end
 
-function ProcScience:GetItemTempEnchantProc(slotID)
+function ProcScience:GetItemInfo(setBonus, itemLink, slotID)
+	local itemInfo = {}
+	local itemID, itemEnchantID = self:GetItemIDsFromLink(itemLink)
+	itemInfo.itemLink = itemLink
+	itemInfo.itemID = itemID
+	itemInfo.itemEnchantID = itemEnchantID
+	itemInfo.slotID = slotID
+	itemInfo.setName = nil
+
+	local _, _, itemQuality = GetItemInfo(itemID)
+	itemInfo.itemQuality = tonumber(itemQuality)
+	local _, _, _, hex = GetItemQualityColor(itemInfo.itemQuality)
+	itemInfo.itemColorHex = hex
+
+
+	local setItemTempEnchantID = self:GetItemTempEnchantFunc(itemInfo, slotID)
+	local setWeaponSpeed = self:GetWeaponSpeedFunc(itemInfo, slotID)
+
 	ProcScience_Tooltip:ClearLines()
 	ProcScience_Tooltip:SetInventoryItem("player", slotID)
 	for i = 1, ProcScience_Tooltip:NumLines() do
-		local line = getglobal(ProcScience_Prefix.."TextLeft"..i)
-		local text = line:GetText()
-		if text then
-			for itemTempEnchantID, procInfo in pairs(L.TemporaryEnchants) do
-				local pattern = "^".. procInfo.enchantName .. " %(%d+ min%)$"
-				if string.find(text, pattern) then
-					return itemTempEnchantID, procInfo
-				end
-			end
+		local leftText = getglobal(ProcScience_Prefix.."TextLeft"..i):GetText()
+		if leftText then
+			setItemTempEnchantID(leftText)
+			self:DetectSetBonusProcs(setBonus, leftText, itemInfo)
+		end
+
+		-- Find weapon speed
+		local rightText = getglobal(ProcScience_Prefix.."TextRight"..i):GetText()
+		if rightText then
+			setWeaponSpeed(rightText)
 		end
 	end
+
+	return itemInfo
 end
 
 function ProcScience:GetItemIDsFromLink(itemLink)
@@ -145,9 +211,6 @@ function ProcScience:GetItemLink(itemID)
 end
 
 function ProcScience:DetectProc(detected, procInfo, procStats, link, procID, slotID)
-	if IsWeaponSlot(slotID) then
-		procStats.attackSpeed = ProcScience:GetAttackSpeed(slotID)
-	end
 	procStats.itemLink = link
 	procStats.spellName = procInfo.spellName
 	procStats.spellID = procInfo.spellID
@@ -175,75 +238,86 @@ function ProcScience:DetectProc(detected, procInfo, procStats, link, procID, slo
 	end
 end
 
-function ProcScience:DetectTempEnchantProc(detected, itemLink, slotID)
-	local hasMainHandEnchant, _, _, hasOffHandEnchant = GetWeaponEnchantInfo()
-	local hasTempEnchant = slotID == INVSLOT_MAIN_HAND and hasMainHandEnchant or
-							slotID == INVSLOT_OFF_HAND and hasOffHandEnchant
-	if not hasTempEnchant then
-		return
-	end
-
-	local itemTempEnchantID, procInfo = self:GetItemTempEnchantProc(slotID)
+function ProcScience:DetectTempEnchantProc(detected, itemInfo)
+	local procInfo = L.TemporaryEnchants[itemInfo.itemTempEnchantID]
 	if not procInfo then
 		return
 	end
 
-	local procID = "tempEnchant:" .. itemTempEnchantID
+	local procID = "tempEnchant:" .. itemInfo.itemTempEnchantID
 	if ProcScienceStats.procs[procID] == nil then
-		ProcScienceStats.procs[procID] = self:NewStats()
+		ProcScienceStats.procs[procID] = self:NewStats(itemInfo.attackSpeed)
 	end
 
 	local procStats = ProcScienceStats.procs[procID]
 	local link = self:GetItemLink(procInfo.itemID)
-	self:DetectProc(detected, procInfo, procStats, link, procID, slotID)
+	self:DetectProc(detected, procInfo, procStats, link, procID, itemInfo.slotID)
 end
 
 
-function ProcScience:DetectEnchantProc(detected, itemLink, slotID)
-	local _, itemEnchantID = self:GetItemIDsFromLink(itemLink)
-	local procInfo = L.Enchants[itemEnchantID]
+function ProcScience:DetectEnchantProc(detected, itemInfo)
+	local procInfo = L.Enchants[itemInfo.itemEnchantID]
 	if not procInfo then
 		return
 	end
 
-	local procID = "enchant:"..itemEnchantID
+	local procID = "enchant:"..itemInfo.itemEnchantID
 	if ProcScienceStats.procs[procID] == nil then
-		ProcScienceStats.procs[procID] = self:NewStats()
+		ProcScienceStats.procs[procID] = self:NewStats(itemInfo.attackSpeed)
 	end
 
 	local procStats = ProcScienceStats.procs[procID]
 	local enchantLink = string.format("%s|Henchant:%s|h[%s Enchant]|h%s", HIGHLIGHT_FONT_COLOR_CODE, procInfo.enchantID, procInfo.enchantName, FONT_COLOR_CODE_CLOSE)
-	self:DetectProc(detected, procInfo, procStats, enchantLink, procID, slotID)
+	self:DetectProc(detected, procInfo, procStats, enchantLink, procID, itemInfo.slotID)
 end
 
-function ProcScience:DetectItemProc(detected, itemLink, slotID)
-	local itemID = self:GetItemIDsFromLink(itemLink)
-	local procInfo = L.Procs[itemID]
+function ProcScience:DetectItemProc(detected, itemInfo)
+	local procInfo = L.Procs[itemInfo.itemID]
 	if not procInfo then
 		return
 	end
 
-	local procID = "item:" .. itemID
+	local procID = "item:" .. itemInfo.itemID
+	if ProcScienceStats.procs[procID] == nil then
+		ProcScienceStats.procs[procID] = self:NewStats(itemInfo.attackSpeed)
+	end
+
+	local procStats = ProcScienceStats.procs[procID]
+	self:DetectProc(detected, procInfo, procStats, itemInfo.itemLink, procID, itemInfo.slotID)
+end
+
+function ProcScience:DetectSetBonusProc(detected, setBonusID, setBonusInfo)
+	local procInfo = L.SetBonus[setBonusID]
+	if not procInfo then
+		return
+	end
+
+	local procID = "setBonus:" .. setBonusID
 	if ProcScienceStats.procs[procID] == nil then
 		ProcScienceStats.procs[procID] = self:NewStats()
 	end
 
 	local procStats = ProcScienceStats.procs[procID]
-	self:DetectProc(detected, procInfo, procStats, itemLink, procID, slotID)
+	local link = string.format("%s[%s]%s", setBonusInfo.hex, setBonusInfo.setName, FONT_COLOR_CODE_CLOSE)
+	self:DetectProc(detected, procInfo, procStats, link, procID, nil)
 end
 
 function ProcScience:DetectItems()
 	local detected = {}
+	local setBonus = {}
 
 	for slotID = INVSLOT_FIRST_EQUIPPED, INVSLOT_LAST_EQUIPPED do
 		local itemLink = GetInventoryItemLink("player", slotID)
 		if itemLink then
-			self:DetectItemProc(detected, itemLink, slotID)
-			if IsMeleeWeaponSlot(slotID) then
-				self:DetectEnchantProc(detected, itemLink, slotID)
-				self:DetectTempEnchantProc(detected, itemLink, slotID)
-			end
+			local itemInfo = self:GetItemInfo(setBonus, itemLink, slotID)
+			self:DetectItemProc(detected, itemInfo)
+			self:DetectEnchantProc(detected, itemInfo)
+			self:DetectTempEnchantProc(detected, itemInfo)
 		end
+	end
+
+	for setBonusID, setBonusInfo in pairs(setBonus) do
+		self:DetectSetBonusProc(detected, setBonusID, setBonusInfo)
 	end
 
 	if self.log >= LOG_LEVEL.TRACKING then
