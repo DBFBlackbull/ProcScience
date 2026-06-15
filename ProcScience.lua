@@ -133,7 +133,11 @@ function ProcScience:SetItemSetBonus(setBonus, leftText, itemInfo)
 	for setBonusID, procInfo in pairs(L.SetBonus) do
 		if string.find(leftText, "^Set: " .. procInfo.description) then
 			if not setBonus[setBonusID] then
-				setBonus[setBonusID] = {setName = itemInfo.setName, quality = 0, hex = nil}
+				setBonus[setBonusID] = {
+					setName = itemInfo.setName or procInfo.setName,
+					quality = 0,
+					hex = nil,
+				}
 			end
 
 			if setBonus[setBonusID].quality < itemInfo.itemQuality then
