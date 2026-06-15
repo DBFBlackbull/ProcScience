@@ -83,8 +83,8 @@ function ProcScience:PopulateSources()
 	end
 	for k, v in pairs(L[self.player.class]) do
 		if type(v) == 'table' then
-			for spellName, spellID in pairs(v) do
-				self.sources[k][spellName] = true
+			for spellName, spellInfo in pairs(v) do
+				self.sources[k][spellName] = spellInfo
 			end
 		end
 	end
@@ -338,27 +338,16 @@ function ProcScience:UpdateProcHits(source, isOffHand, isPhantomStrike, amount)
 
 	isOffHand = isOffHand or false
 	amount = amount or 1
-	for spellName, proc in pairs(self.tracked) do
-		if proc.filter == nil or (proc.filter == "main hand" and not isOffHand and not self.player.disarmed) or (proc.filter == "off-hand" and isOffHand) then
-			local trigger = proc.info.events.trigger
-			if trigger == L.TRIGGER_ON_HIT or not self.sources.AreaEffect[source] or self.pendingAE[source] then
-				if isPhantomStrike then
-					proc.stats.phantomHits = proc.stats.phantomHits + 1
-				else
-					proc.stats.hits = proc.stats.hits + amount
-				end
-			end
-		end
-	end
-
-	for spellName, proc in pairs(self.trackedBuffs) do
-		if proc.filter == nil or (proc.filter == "main hand" and not isOffHand and not self.player.disarmed) or (proc.filter == "off-hand" and isOffHand) then
-			local trigger = proc.info.events.trigger
-			if trigger == L.TRIGGER_ON_HIT or not self.sources.AreaEffect[source] or self.pendingAE[source] then
-				if isPhantomStrike then
-					proc.stats.phantomHits = proc.stats.phantomHits + 1
-				else
-					proc.stats.hits = proc.stats.hits + amount
+	for _, tracked in ipairs({self.tracked, self.trackedBuffs}) do
+		for spellName, proc in pairs(tracked) do
+			if proc.filter == nil or (proc.filter == "main hand" and not isOffHand and not self.player.disarmed) or (proc.filter == "off-hand" and isOffHand) then
+				local trigger = proc.info.events.trigger
+				if trigger == L.TRIGGER_ON_HIT or not self.sources.AreaEffect[source] or self.pendingAE[source] then
+					if isPhantomStrike then
+						proc.stats.phantomHits = proc.stats.phantomHits + 1
+					else
+						proc.stats.hits = proc.stats.hits + amount
+					end
 				end
 			end
 		end
@@ -575,8 +564,20 @@ function ProcScience:OnCombatLogEvent(timestamp)
 		local _, _, spellCrit, unitCrit = string.find(arg1, "Your (.+) crits (.+) for ")
 		local spellName = spellHit or spellCrit
 		local unit = unitHit or unitCrit
-		if self.sources.Damage[spellName] then
-			return self:UpdateProcHits(spellName, false)
+		if spellName and unit then
+			local damage = self.sources.Damage[spellName]
+			if damage then
+				return self:UpdateProcHits(spellName, false, damage.isPhantomStrike)
+			end
+
+			---- Not sure if offhand procs count as main hand hit.
+			---- Since they are abilities my best guess is that procs are considered main hand
+			--local proc = self:CheckProcEvent(timestamp, event, unit, spellName)
+			--if proc and proc.info.isPhantomStrike then
+			--	return self:UpdateProcHits(spellName, false, proc.info.isPhantomStrike)
+			--end
+
+			return
 		end
 
 		local _, _, spellMiss, unitMiss = string.find(arg1, "Your (.+) missed (.+)%.")
