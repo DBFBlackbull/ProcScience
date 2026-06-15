@@ -95,38 +95,40 @@ local ProcScience_Tooltip = getglobal(ProcScience_Prefix) or CreateFrame("GameTo
 ProcScience_Tooltip:SetOwner(WorldFrame, "ANCHOR_NONE")
 
 function ProcScience:GetItemTempEnchantFunc(itemInfo, slotID)
-	local itemTempEnchantIDFunc = function(leftText) return end
-	if IsMeleeWeaponSlot(slotID) then
-		local hasMainHandEnchant, _, _, hasOffHandEnchant = GetWeaponEnchantInfo()
-		local hasTempEnchant = slotID == INVSLOT_MAIN_HAND and hasMainHandEnchant or
-				slotID == INVSLOT_OFF_HAND and hasOffHandEnchant
-		if hasTempEnchant then
-			itemTempEnchantIDFunc = function(leftText)
-				for itemTempEnchantID, procInfo in pairs(L.TemporaryEnchants) do
-					local pattern = "^".. procInfo.enchantName .. " %(%d+ (%a%a%a)%)$"
-					if string.find(leftText, pattern) then
-						itemInfo.itemTempEnchantID = itemTempEnchantID
-					end
-				end
+	local noOpFunc = function(leftText) return end
+	if not IsMeleeWeaponSlot(slotID) then
+		return noOpFunc
+	end
+
+	local hasMainHandEnchant, _, _, hasOffHandEnchant = GetWeaponEnchantInfo()
+	local hasTempEnchant = slotID == INVSLOT_MAIN_HAND and hasMainHandEnchant or
+			slotID == INVSLOT_OFF_HAND and hasOffHandEnchant
+	if not hasTempEnchant then
+		return noOpFunc
+	end
+
+	return function(leftText)
+		for itemTempEnchantID, procInfo in pairs(L.TemporaryEnchants) do
+			local pattern = "^".. procInfo.enchantName .. " %(%d+ (%a%a%a)%)$"
+			if string.find(leftText, pattern) then
+				itemInfo.itemTempEnchantID = itemTempEnchantID
 			end
 		end
 	end
-
-	return itemTempEnchantIDFunc
 end
 
 function ProcScience:GetWeaponSpeedFunc(itemInfo, slotID)
-	local getWeaponSpeedFunc = function(rightText) return end
-	if IsWeaponSlot(slotID) then
-		getWeaponSpeedFunc = function(rightText)
-			local _, _, speed = string.find(rightText, "Speed (%d%.%d%d)")
-			if speed then
-				itemInfo.speed = tonumber(speed)
-			end
-		end
+	local noOpFunc = function(rightText) return end
+	if not IsWeaponSlot(slotID) then
+		return noOpFunc
 	end
 
-	return getWeaponSpeedFunc
+	return function(rightText)
+		local _, _, speed = string.find(rightText, "Speed (%d%.%d%d)")
+		if speed then
+			itemInfo.speed = tonumber(speed)
+		end
+	end
 end
 
 function ProcScience:DetectSetBonusProcs(setBonus, leftText, itemInfo)
@@ -333,30 +335,25 @@ function ProcScience:DetectItems()
 	self.tracked = detected
 end
 
-function ProcScience:GetBuffName(buffIndex)
-	ProcScience_Tooltip:ClearLines()
-	ProcScience_Tooltip:SetPlayerBuff(buffIndex)
-	local line = getglobal(ProcScience_Tooltip:GetName().."TextLeft1")
-	return line:GetText()
-end
-
-function ProcScience:GetBuffProc(buffIndex)
-	local buffID = GetPlayerBuffID and GetPlayerBuffID(buffIndex)
-	local procInfo = L.Buffs[buffID]
-	if procInfo then
-		return buffID, procInfo
+function ProcScience:GetBuffIDFunc()
+	if GetPlayerBuffID then
+		return GetPlayerBuffID -- superwow
 	end
 
-	local buffName = self:GetBuffName(buffIndex)
-	for buffID, procInfo in pairs(L.Buffs) do
-		if procInfo.buffName == buffName then
-			return buffID, procInfo
+	return function(buffIndex)
+		ProcScience_Tooltip:ClearLines()
+		ProcScience_Tooltip:SetPlayerBuff(buffIndex)
+		local buffName = getglobal(ProcScience_Tooltip:GetName().."TextLeft1"):GetText()
+		for buffID, procInfo in pairs(L.Buffs) do
+			if procInfo.buffName == buffName then
+				return buffID
+			end
 		end
 	end
 end
 
-function ProcScience:DetectBuffProc(detected, buffIndex)
-	local buffID, procInfo = self:GetBuffProc(buffIndex)
+function ProcScience:DetectBuffProc(detected, buffID)
+	local procInfo = L.Buffs[buffID]
 	if not procInfo then
 		return
 	end
@@ -374,11 +371,14 @@ end
 function ProcScience:DetectBuffs()
 	local detected = {}
 
+	local getBuffID = self:GetBuffIDFunc()
+
 	local buffIndex = 0
 	while buffIndex > -1 do
 		buffIndex = GetPlayerBuff(buffIndex, "HELPFUL")
 		if buffIndex > -1 then
-			self:DetectBuffProc(detected, buffIndex)
+			local buffID = getBuffID(buffIndex)
+			self:DetectBuffProc(detected, buffID)
 			buffIndex = buffIndex + 1
 		end
 	end
