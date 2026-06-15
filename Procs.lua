@@ -331,6 +331,10 @@ L.Procs = {
 	--endregion
 }
 
+L.SetBonus = {
+	[27498] = { setName = "Lightforge Armor", spellID = 27499, spellName = "Crusader's Wrath", school = L.SCHOOL.Holy, events = L.Events.SelfAura, superWowEvents = L.Events.TargetSuperWow, description = "Chance on melee attack to increase your damage and healing done by magical spells and effects by up to 95 for 10 sec." },
+}
+
 L.Enchants = {
 	[1900] = { enchantName = "Crusader",      enchantID = 20034, spellID = 20007, spellName = "Holy Strength", school = L.SCHOOL.Holy,   events = L.Events.SelfHeal,   superWowEvents = L.Events.SelfSuperWow },
 	[912]  = { enchantName = "Demonslaying",  enchantID = 13915, spellID = 13907, spellName = "Smite Demon",   school = L.SCHOOL.Holy,   events = L.Events.Damage,     superWowEvents = L.Events.TargetSuperWow },
