@@ -129,7 +129,14 @@ function ProcScience:GetWeaponSpeedFunc(itemInfo, slotID)
 	return getWeaponSpeedFunc
 end
 
-function ProcScience:SetItemSetBonus(setBonus, leftText, itemInfo)
+function ProcScience:DetectSetBonusProcs(setBonus, leftText, itemInfo)
+	-- Set names are listed before bonuses
+	local _,_, setName = string.find(leftText, "(.+) %(%d/%d%)")
+	if setName then
+		itemInfo.setName = setName
+		return
+	end
+
 	for setBonusID, procInfo in pairs(L.SetBonus) do
 		if string.find(leftText, "^Set: " .. procInfo.description) then
 			if not setBonus[setBonusID] then
@@ -172,11 +179,7 @@ function ProcScience:GetItemInfo(setBonus, itemLink, slotID)
 		local leftText = getglobal(ProcScience_Prefix.."TextLeft"..i):GetText()
 		if leftText then
 			setItemTempEnchantID(leftText)
-
-			-- Find set bonus procs
-			local _,_, setName = string.find(leftText, "(.+) %(%d/%d%)")
-			itemInfo.setName = itemInfo.setName or setName
-			self:SetItemSetBonus(setBonus, leftText, itemInfo)
+			self:DetectSetBonusProcs(setBonus, leftText, itemInfo)
 		end
 
 		-- Find weapon speed
