@@ -129,10 +129,17 @@ function ProcScience:GetWeaponSpeedFunc(itemInfo, slotID)
 	return getWeaponSpeedFunc
 end
 
-function ProcScience:SetItemSetBonusID(setBonus, leftText, setName)
+function ProcScience:SetItemSetBonus(setBonus, leftText, itemInfo)
 	for setBonusID, procInfo in pairs(L.SetBonus) do
 		if string.find(leftText, "^Set: " .. procInfo.description) then
-			setBonus[setBonusID] = setName
+			if not setBonus[setBonusID] then
+				setBonus[setBonusID] = {setName = itemInfo.setName, quality = 0, hex = nil}
+			end
+
+			if setBonus[setBonusID].quality < itemInfo.itemQuality then
+				setBonus[setBonusID].quality = itemInfo.itemQuality
+				setBonus[setBonusID].hex = itemInfo.itemColorHex
+			end
 		end
 	end
 end
@@ -145,6 +152,12 @@ function ProcScience:GetItemInfo(setBonus, itemLink, slotID)
 	itemInfo.itemEnchantID = itemEnchantID
 	itemInfo.slotID = slotID
 	itemInfo.setName = nil
+
+	local _, _, itemQuality = GetItemInfo(itemID)
+	itemInfo.itemQuality = tonumber(itemQuality)
+	local _, _, _, hex = GetItemQualityColor(itemInfo.itemQuality)
+	itemInfo.itemColorHex = hex
+
 
 	local setItemTempEnchantID = self:GetItemTempEnchantFunc(itemInfo, slotID)
 	local setWeaponSpeed = self:GetWeaponSpeedFunc(itemInfo, slotID)
@@ -159,7 +172,7 @@ function ProcScience:GetItemInfo(setBonus, itemLink, slotID)
 			-- Find set bonus procs
 			local _,_, setName = string.find(leftText, "(.+) %(%d/%d%)")
 			itemInfo.setName = itemInfo.setName or setName
-			self:SetItemSetBonusID(setBonus, leftText, itemInfo.setName)
+			self:SetItemSetBonus(setBonus, leftText, itemInfo)
 		end
 
 		-- Find weapon speed
@@ -266,6 +279,22 @@ function ProcScience:DetectItemProc(detected, itemInfo)
 	self:DetectProc(detected, procInfo, procStats, itemInfo.itemLink, procID, itemInfo.slotID)
 end
 
+function ProcScience:DetectSetBonusProc(detected, setBonusID, setBonusInfo)
+	local procInfo = L.SetBonus[setBonusID]
+	if not procInfo then
+		return
+	end
+
+	local procID = "setBonus:" .. setBonusID
+	if ProcScienceStats.procs[procID] == nil then
+		ProcScienceStats.procs[procID] = self:NewStats()
+	end
+
+	local procStats = ProcScienceStats.procs[procID]
+	local link = string.format("%s[%s]%s", setBonusInfo.hex, setBonusInfo.setName, FONT_COLOR_CODE_CLOSE)
+	self:DetectProc(detected, procInfo, procStats, link, procID, nil)
+end
+
 function ProcScience:DetectItems()
 	local detected = {}
 	local setBonus = {}
@@ -278,6 +307,10 @@ function ProcScience:DetectItems()
 			self:DetectEnchantProc(detected, itemInfo)
 			self:DetectTempEnchantProc(detected, itemInfo)
 		end
+	end
+
+	for setBonusID, setBonusInfo in pairs(setBonus) do
+		self:DetectSetBonusProc(detected, setBonusID, setBonusInfo)
 	end
 
 	if self.log >= LOG_LEVEL.TRACKING then
