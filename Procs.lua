@@ -332,8 +332,10 @@ L.Procs = {
 }
 
 L.SetBonus = {
-	[27498] = { setName = "Lightforge Armor", spellID = 27499, spellName = "Crusader's Wrath", school = L.SCHOOL.Holy,     events = L.Events.SelfAura, superWowEvents = L.Events.SelfSuperWow, description = "Chance on melee attack to increase your damage and healing done by magical spells and effects by up to 95 for 10 sec." },
-	[21747] = { setName = "Lawbringer Armor", spellID = 23544, spellName = "Healing Circle",   school = L.SCHOOL.Physical, events = L.Events.SelfHeal, superWowEvents = L.Events.SelfSuperWow, description = "Gives the Paladin a chance on every melee hit to heal your party for 189 to 211." },
+	[27498] = { setName = "Lightforge Armor",    spellID = 27499, spellName = "Crusader's Wrath",     school = L.SCHOOL.Holy,     events = L.Events.SelfAura, superWowEvents = L.Events.SelfSuperWow, description = "Chance on melee attack to increase your damage and healing done by magical spells and effects by up to 95 for 10 sec." },
+	[21747] = { setName = "Lawbringer Armor",    spellID = 23544, spellName = "Healing Circle",       school = L.SCHOOL.Physical, events = L.Events.SelfHeal, superWowEvents = L.Events.SelfSuperWow, description = "Gives the Paladin a chance on every melee hit to heal your party for 189 to 211." },
+	[27419] = { setName = "Battlegear of Valor", spellID = 27418, spellName = "Warrior's Resolve",    school = L.SCHOOL.Holy,     events = L.Events.SelfHeal, superWowEvents = L.Events.SelfSuperWow, description = "Chance on melee attack to heal you for 88 to 132." },
+	[27787] = { setName = "Shadowcraft Armor",   spellID = 27788, spellName = "Rogue Armor Energize", school = L.SCHOOL.Holy,     events = L.Events.SelfHeal, superWowEvents = L.Events.SelfSuperWow, description = "Chance on melee attack to restore 35 energy." },
 }
 
 L.Enchants = {

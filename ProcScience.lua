@@ -690,9 +690,9 @@ function ProcScience:OnCombatLogEvent(timestamp)
 		local _, _, spellExtraAttack = string.find(arg1, "You gain %d extra attacks? through (.+)%.")
 		local _, _, spellHeal = string.find(arg1, "Your (.+) heals you for %d+")
 		local _, _, spellMana = string.find(arg1, "You gain %d+ Mana from (.+)%.")
-		-- Add energy
+		local _, _, spellEnergy = string.find(arg1, "You gain %d+ Energy from (.+)%.")
 
-		local spellName = spellExtraAttack or spellHeal or spellMana
+		local spellName = spellExtraAttack or spellHeal or spellMana or spellEnergy
 		return self:CheckProcEvent(timestamp, event, self.player.name, spellName)
 	end
 
