@@ -167,9 +167,11 @@ function ProcScience:GetItemInfo(setBonus, itemLink, slotID)
 	itemInfo.setName = nil
 
 	local _, _, itemQuality = GetItemInfo(itemID)
-	itemInfo.itemQuality = tonumber(itemQuality)
-	local _, _, _, hex = GetItemQualityColor(itemInfo.itemQuality)
-	itemInfo.itemColorHex = hex
+	if itemQuality then -- Might not loaded on a fresh cache.
+		itemInfo.itemQuality = tonumber(itemQuality)
+		local _, _, _, hex = GetItemQualityColor(itemInfo.itemQuality)
+		itemInfo.itemColorHex = hex
+	end
 
 
 	local setItemTempEnchantID = self:GetItemTempEnchantFunc(itemInfo, slotID)
