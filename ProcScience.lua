@@ -648,10 +648,10 @@ function ProcScience:OnCombatLogEvent(timestamp)
 
 			---- Not sure if offhand procs count as main hand hit.
 			---- Since they are abilities my best guess is that procs are considered main hand
-			--local proc = self:CheckProcEvent(timestamp, event, unit, spellName)
-			--if proc and proc.info.isPhantomStrike then
-			--	return self:UpdateProcHits(spellName, false, proc.info.isPhantomStrike)
-			--end
+			local proc = self:CheckProcEvent(timestamp, event, unit, spellName)
+			if proc and proc.info.isPhantomStrike then
+				return self:UpdateProcHits(spellName, false, proc.info.isPhantomStrike)
+			end
 
 			return
 		end
