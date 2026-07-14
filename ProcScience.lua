@@ -100,6 +100,20 @@ function ProcScience:GetItemTempEnchantFunc(itemInfo, slotID)
 		return noOpFunc
 	end
 
+	if GetWeaponEnchantID then
+		local mainHandTempEnchantID, offhandTempEnchantID = GetWeaponEnchantID("player")
+		self:Print("main hand temp: ".. tostring(mainHandTempEnchantID))
+		self:Print("off hand temp: "..tostring(offhandTempEnchantID))
+		if slotID == INVSLOT_MAIN_HAND then
+			itemInfo.itemTempEnchantID = mainHandTempEnchantID
+		end
+		if slotID == INVSLOT_OFF_HAND then
+			itemInfo.itemTempEnchantID = offhandTempEnchantID
+		end
+
+		return noOpFunc
+	end
+
 	local hasMainHandEnchant, _, _, hasOffHandEnchant = GetWeaponEnchantInfo()
 	local hasTempEnchant = slotID == INVSLOT_MAIN_HAND and hasMainHandEnchant or
 			slotID == INVSLOT_OFF_HAND and hasOffHandEnchant
@@ -112,6 +126,7 @@ function ProcScience:GetItemTempEnchantFunc(itemInfo, slotID)
 			local pattern = "^".. procInfo.enchantName .. " %(%d+ (%a%a%a)%)$"
 			if string.find(leftText, pattern) then
 				itemInfo.itemTempEnchantID = itemTempEnchantID
+				return
 			end
 		end
 	end
@@ -172,7 +187,6 @@ function ProcScience:GetItemInfo(setBonus, itemLink, slotID)
 		local _, _, _, hex = GetItemQualityColor(itemInfo.itemQuality)
 		itemInfo.itemColorHex = hex
 	end
-
 
 	local setItemTempEnchantID = self:GetItemTempEnchantFunc(itemInfo, slotID)
 	local setWeaponSpeed = self:GetWeaponSpeedFunc(itemInfo, slotID)
@@ -488,9 +502,9 @@ function ProcScience:CheckProcEvent(timestamp, event, unit, spellName, spellID)
 end
 
 function ProcScience:OnAddonLoaded()
-	self.superWowActive = true
-	if not GetPlayerBuffID or not CombatLogAdd or not SpellInfo then -- super wow specific functions
-		self.superWowActive = false
+	self.superWowActive = false
+	if SUPERWOW_STRING and SUPERWOW_VERSION then -- super wow specific functions
+		self.superWowActive = true
 	end
 
 	self.player = {
