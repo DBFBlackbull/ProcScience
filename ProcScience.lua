@@ -139,7 +139,7 @@ function ProcScience:GetWeaponSpeedFunc(itemInfo, slotID)
 	return function(rightText)
 		local _, _, speed = string.find(rightText, "Speed (%d%.%d%d)")
 		if speed then
-			itemInfo.speed = tonumber(speed)
+			itemInfo.attackSpeed = tonumber(speed)
 		end
 	end
 end
@@ -296,7 +296,6 @@ function ProcScience:DetectItemProc(detected, itemInfo)
 	local procID = "item:" .. itemInfo.itemID
 	if ProcScienceStats.procs[procID] == nil then
 		ProcScienceStats.procs[procID] = self:NewStats(itemInfo.attackSpeed)
-		self:Print(itemInfo.attackSpeed)
 	end
 
 	local procStats = ProcScienceStats.procs[procID]
