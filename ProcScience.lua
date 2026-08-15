@@ -102,8 +102,6 @@ function ProcScience:GetItemTempEnchantFunc(itemInfo, slotID)
 
 	if GetWeaponEnchantID then
 		local mainHandTempEnchantID, offhandTempEnchantID = GetWeaponEnchantID("player")
-		self:Print("main hand temp: ".. tostring(mainHandTempEnchantID))
-		self:Print("off hand temp: "..tostring(offhandTempEnchantID))
 		if slotID == INVSLOT_MAIN_HAND then
 			itemInfo.itemTempEnchantID = mainHandTempEnchantID
 		end
@@ -298,6 +296,7 @@ function ProcScience:DetectItemProc(detected, itemInfo)
 	local procID = "item:" .. itemInfo.itemID
 	if ProcScienceStats.procs[procID] == nil then
 		ProcScienceStats.procs[procID] = self:NewStats(itemInfo.attackSpeed)
+		self:Print(itemInfo.attackSpeed)
 	end
 
 	local procStats = ProcScienceStats.procs[procID]
@@ -846,6 +845,11 @@ function ProcScience:Reset(item)
 	end
 end
 
+function ProcScience:ClearAll()
+	self:Print("Clearing all proc stats")
+	ProcScienceStats.procs = {}
+end
+
 function ProcScience:OnEvent()
 	local timestamp = GetTime()
 
@@ -938,6 +942,8 @@ SlashCmdList["PROCS"] = function(msg)
 		ProcScience:ResetAll()
 	elseif msg == "reset" then
 		ProcScience:ResetTracked()
+	elseif msg == "clear all" then
+		ProcScience:ClearAll()
 	elseif msg == "debug" then
 		ProcScience:Dump()
 	elseif msg == "verbose" then
