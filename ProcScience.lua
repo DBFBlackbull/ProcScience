@@ -347,6 +347,14 @@ function ProcScience:DetectItems()
 	end
 
 	self.tracked = detected
+	self.sources.phantomStrikes = {}
+	for k, proc in pairs(detected) do
+		if proc.info.isPhantomStrike then
+			local phantomStrikeSpellName = proc.info.phantomStrikeSpellName or proc.info.spellName
+			local phantomStrikeInfo = { spellID = proc.info.phantomStrikeSpellID or proc.info.spellID }
+			self.sources.phantomStrikes[phantomStrikeSpellName] = phantomStrikeInfo
+		end
+	end
 end
 
 function ProcScience:GetBuffIDFunc()
@@ -487,8 +495,6 @@ function ProcScience:CheckProcEvent(timestamp, event, unit, spellName, spellID)
 		if self:IsGCD() then
 			proc.stats.gcdProc = true
 		end
-
-		return proc
 	end
 
 	--if (destGUID == self.player.guid or target ~= L.TARGET_SELF) and
@@ -658,14 +664,14 @@ function ProcScience:OnCombatLogEvent(timestamp)
 				return self:UpdateProcHits(spellName, false, damage.isPhantomStrike)
 			end
 
+			self:CheckProcEvent(timestamp, event, unit, spellName)
+
 			---- Not sure if offhand procs count as main hand hit.
 			---- Since they are abilities my best guess is that procs are considered main hand
-			local proc = self:CheckProcEvent(timestamp, event, unit, spellName)
-			if proc and proc.info.isPhantomStrike then
-				return self:UpdateProcHits(spellName, false, proc.info.isPhantomStrike)
+			local phantomStrike = self.sources.phantomStrikes[spellName]
+			if phantomStrike then
+				return self:UpdateProcHits(spellName, false, true)
 			end
-
-			return
 		end
 
 		local _, _, spellMiss, unitMiss = string.find(arg1, "Your (.+) missed (.+)%.")
@@ -697,6 +703,11 @@ function ProcScience:OnCombatLogEvent(timestamp)
 		--end
 
 		self:CheckProcEvent(timestamp, event, unit, spellName)
+
+		local phantomStrike = self.sources.phantomStrikes[spellName]
+		if phantomStrike then
+			return self:UpdateProcHits(spellName, false, true)
+		end
 	end
 
 	-- Track extra attacks from Hand of Justice or Ironfoe

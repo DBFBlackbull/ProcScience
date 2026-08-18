@@ -265,7 +265,7 @@ L.Procs = {
 	[1318]  = { itemName = "Night Reaver",                spellID = 13480, spellName = "Shadow Bolt",         school = L.SCHOOL.Shadow,   events = L.Events.Damage,     superWowEvents = L.Events.TargetSuperWow }, -- Needs testing
 	[19169] = { itemName = "Nightfall",                   spellID = 23605, spellName = "Spell Vulnerability", school = L.SCHOOL.Physical, events = L.Events.TargetAura }, -- Does not trigger UNIT_CASTEVENT
 	[9425]  = { itemName = "Pendulum of Doom",            spellID = 10373, spellName = "Fatal Wound",         school = L.SCHOOL.Physical, events = L.Events.Damage,     superWowEvents = L.Events.TargetSuperWow, isPhantomStrike = true }, -- Needs testing
-	[7717]  = { itemName = "Ravager",                     spellID = 9632,  spellName = "Bladestorm",          school = L.SCHOOL.Physical, events = L.Events.SelfAura,   superWowEvents = L.Events.TargetSuperWow, isPhantomStrike = true },
+	[7717]  = { itemName = "Ravager",                     spellID = 9632,  spellName = "Bladestorm",          school = L.SCHOOL.Physical, events = L.Events.SelfAura,   superWowEvents = L.Events.TargetSuperWow, isPhantomStrike = true, phantomStrikeSpellID = 9633, phantomStrikeSpellName = "Whirlwind", },
 	[13285] = { itemName = "The Nicker",                  spellID = 17407, spellName = "Wound",               school = L.SCHOOL.Physical, events = L.Events.Damage,     superWowEvents = L.Events.TargetSuperWow, isPhantomStrike = true },
 	[9486]  = { itemName = "Supercharger Battle Axe",     spellID = 13527, spellName = "Lightning Bolt",      school = L.SCHOOL.Nature,   events = L.Events.Damage,     superWowEvents = L.Events.TargetSuperWow },
 	--endregion
